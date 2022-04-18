@@ -14,19 +14,39 @@
         <ul>
         更新日志
         - v1.02
-          - 支持表名和列表根据定义编码自动翻译成注释
+          -
         - v1.01
-          - 优化支持数据库查询数据生成可重复执行sql语句
+          -
         - v1.0
           - 支持生成以下生成脚本
-            - ADD_TABLE(创建表),
-            - ADD_INDEX(创建索引),
-            - ADD_COLUMN(创建字段),
-            - ADD_DATA(插入数据存储过程需自己编辑),
-            - INSERT_DATA(插入可重复执行数据)
+            -
+            -
+            -
+            -
+            -
         </ul>
         ]]>
     </description>
+    <change-notes><![CDATA[
+      <h3>v1.02 update</h3>
+      <ul>
+          <li>支持表名和列表根据定义编码自动翻译成注释</li>
+      </ul>
+      <h3>v1.01 update</h3>
+      <ul>
+          <li>优化支持数据库查询数据生成可重复执行sql语句</li>
+      </ul>
+      <h3>v1.01 update</h3>
+      <ul>
+          <li>支持生成以下生成脚本</li>
+          <li>ADD_TABLE(创建表)</li>
+          <li>ADD_INDEX(创建索引)</li>
+          <li>ADD_COLUMN(创建字段)</li>
+          <li>ADD_DATA(插入数据存储过程需自己编辑)</li>
+          <li>INSERT_DATA(插入可重复执行数据)</li>
+      </ul>
+          ]]>
+    </change-notes>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
@@ -34,11 +54,11 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- 配置 File -> Settings -> Tools -->
-<!--        <projectConfigurable groupId="tools" displayName="My Test Config" id="setting.id"-->
-<!--                             instance="com.idea.plugin.window.SettingFactory"/>-->
+        <!--        <projectConfigurable groupId="tools" displayName="My Test Config" id="setting.id"-->
+        <!--                             instance="com.idea.plugin.window.SettingFactory"/>-->
         <!-- 窗体 (IDEA 界面右侧) -->
-<!--        <toolWindow id="Read-Book" secondary="false" anchor="right"-->
-<!--                    factoryClass="com.idea.plugin.window.ReadFactory"/>-->
+        <!--        <toolWindow id="Read-Book" secondary="false" anchor="right"-->
+        <!--                    factoryClass="com.idea.plugin.window.ReadFactory"/>-->
     </extensions>
 
     <actions>
