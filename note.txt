@@ -1,0 +1,37 @@
+提示框：
+// 必须调用show方法才能显示
+MessageDialogBuilder.yesNo("标题", "消息").show();
+// 可以指定图标
+Messages.showMessageDialog("请查看日志排查问题", "操作结果", Messages.getErrorIcon());
+
+PsiFile：
+PsiFile psiFile = e.getRequiredData(CommonDataKeys.PSI_FILE);
+FileViewProvider viewProvider = psiFile.getViewProvider();
+VirtualFile virtualFile = viewProvider.getVirtualFile();
+// 获取文件的后缀，是以.进行分割的，最后一个元素就是后缀
+// 如果文件没有后缀，或者没有.，那么这个值为null
+// abc -> null
+// a.b.c -> c
+// abc.sql -> sql
+String extension = virtualFile.getExtension();
+// 获取文件内容
+String content = psiFile.getText()
+
+e.getPresentation().setVisible(false);
+e.getPresentation().setEnabled(false);
+
+通知：
+NotificationGroup notificationGroup = new NotificationGroup("asd", NotificationDisplayType.BALLOON, true);
+final Notification info = notificationGroup.createNotification("info 通知", MessageType.INFO);
+Notifications.Bus.notify(info);
+
+
+选择文件夹：
+// FileChooserDescriptorFactory可以选择一个或者多个文件夹
+VirtualFile virtualFile = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFileDescriptor(), project, project.getBaseDir());
+// 取消时返回null
+if (virtualFile != null) {
+
+}
+
+

@@ -1,0 +1,43 @@
+<idea-plugin>
+    <!-- 插件唯一标识，用于在插件市场中唯一确定身份的标识，在不同版本中，必须保持一致，建议设置值为：包名 + 插件名称 -->
+    <id>com.demo.plugin.create-sql</id>
+    <!-- 插件的名称，显示在IDEA已安装插件列表中 -->
+    <name>create-sql</name>
+    <!--  -->
+    <vendor email=""></vendor>
+    <!--    <idea-version since-build="191.0"/>-->
+    <!-- 插件的描述 -->
+    <description>
+        <![CDATA[
+        <h2>创建可重复执行SQL脚本</h2>
+        <ul>
+        <a href="https://doc.weixin.qq.com/doc/w3_ANsADwZcAOk8rgfVfY2SLO9idOfx0?scode=AMYAEgcaAAwaCEg8iWANsADwZcAOk">插件使用文档</a><br>
+        <a href="https://doc.weixin.qq.com/doc/w3_ANsADwZcAOkKsyYN8phQKm2DbbwXU?scode=AMYAEgcaAAwO8A3a1HANsADwZcAOk">插件demo文档</a><br>
+        </ul>
+        ]]>
+    </description>
+
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- 配置 File -> Settings -> Tools -->
+<!--        <projectConfigurable groupId="tools" displayName="My Test Config" id="setting.id"-->
+<!--                             instance="com.idea.plugin.window.SettingFactory"/>-->
+        <!-- 窗体 (IDEA 界面右侧) -->
+<!--        <toolWindow id="Read-Book" secondary="false" anchor="right"-->
+<!--                    factoryClass="com.idea.plugin.window.ReadFactory"/>-->
+    </extensions>
+
+    <actions>
+        <action id="HelloWorld-project" class="com.idea.plugin.popup.ProjectViewPopupAction"
+                text="FsscSqlFile" description="CreateSqlFile">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+        <action id="HelloWorld-editor" class="com.idea.plugin.popup.EditorPopupAction"
+                text="FsscSqlFile" description="CreateSqlFile">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
