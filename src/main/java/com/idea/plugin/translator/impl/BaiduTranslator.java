@@ -46,7 +46,7 @@ public class BaiduTranslator extends AbstractTranslator {
 
     private String get(String text) throws InterruptedException {
         String result = "";
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             String salt = RandomStringUtils.randomNumeric(16);
             String sign = DigestUtils.md5Hex(appId + text + salt + token);
             String eText = HttpUtil.encode(text);

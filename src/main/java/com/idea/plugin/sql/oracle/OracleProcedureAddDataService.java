@@ -16,7 +16,8 @@ public class OracleProcedureAddDataService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new OracleProcedureAddData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增字段" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         String[] columnNameArr = tableInfoVO.insertColumnName.split(",");
         String columnNameValue = Arrays.stream(Arrays.copyOfRange(columnNameArr, 1, columnNameArr.length))
                 .map(columnName -> "V_TABLE_DATA." + columnName.trim()).collect(Collectors.joining(", "));

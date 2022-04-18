@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class OracleProcedureAddColumn implements IProcedureService {
 
     public static String comment =
-            "\n-- Oracle %s创建字段\n";
+            "\n-- Oracle %s\n";
 
     public static String addColumnProcedure =
             "CREATE OR REPLACE PROCEDURE ADD_%s_COLUMN(V_TABLE_NAME IN VARCHAR, V_COLUMN_NAME IN VARCHAR, V_COLUMN_TYPE IN VARCHAR, V_COMMENT IN VARCHAR) AS\n" +

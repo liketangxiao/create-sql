@@ -16,7 +16,8 @@ public class MysqlProcedureAddDataService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureAddData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         String[] columnNameArr = tableInfoVO.insertColumnName.split(",");
         String columnNameDeclare = Arrays.stream(columnNameArr)
                 .map(columnName -> "    DECLARE V_" + columnName.trim() + " TINYTEXT;").collect(Collectors.joining("\n"));

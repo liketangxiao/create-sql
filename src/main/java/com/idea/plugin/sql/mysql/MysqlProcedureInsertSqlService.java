@@ -24,7 +24,8 @@ public class MysqlProcedureInsertSqlService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureInsertData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         Connection connection = DBProcedureUtils.getConnection(tableInfoVO);
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(tableInfoVO.insertSql);

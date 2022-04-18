@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class OracleProcedureAddIndex implements IProcedureService {
 
     public static String comment =
-            "\n-- Oracle %s创建索引\n";
+            "\n-- Oracle %s\n";
 
     public static String addIndexProcedure =
             "CREATE OR REPLACE PROCEDURE ADD_%s_INDEX(V_TABLE_NAME IN VARCHAR, V_INDEX_NAME IN VARCHAR, V_COLUMN_NAME IN VARCHAR) AS\n" +

@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class MysqlProcedureInsertData implements IProcedureService {
 
     public static String comment =
-            "\n-- Mysql %s数据重复插入\n";
+            "\n-- Mysql %s\n";
 
     public static String insertDataProcedure =
             "INSERT INTO %s(%s)\n" +

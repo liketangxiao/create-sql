@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class OracleProcedureAddData implements IProcedureService {
 
     public static String comment =
-            "\n-- Oracle %s新增数据\n";
+            "\n-- Oracle %s\n";
 
     public static String insertDataProcedure =
             "CREATE OR REPLACE PROCEDURE INSERT_%s_DATA(%s) AS\n" +

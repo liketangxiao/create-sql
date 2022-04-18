@@ -17,6 +17,8 @@ public class OracleProcedureAddTableService extends BaseProcedureService {
             return;
         }
         OracleProcedureAddTable procedureService = new OracleProcedureAddTable();
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增表" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         String procedure = procedureService.getProcedure();
         Integer length = tableInfoVO.fieldInfos.stream().map(fieldInfo -> fieldInfo.columnName.length()).max(Comparator.comparing(Integer::intValue)).get();
         String call = tableInfoVO.fieldInfos.stream().map(fieldVO -> {

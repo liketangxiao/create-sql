@@ -15,10 +15,11 @@ public class MysqlProcedureAddIndexService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureAddIndex();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增索引" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, tableInfoVO.tableName));
         for (IndexInfoVO indexInfoVO : tableInfoVO.indexInfos) {
-            String alterAddIndexCall = String.format(procedureService.getCall(), tableInfoVO.tableName, indexInfoVO.indexName, indexInfoVO.indexColumnName);
+            String alterAddIndexCall = String.format(procedureService.getCall(), tableInfoVO.tableName, tableInfoVO.tableName, indexInfoVO.indexName, indexInfoVO.indexColumnName);
             writeFile(path, alterAddIndexCall);
         }
         writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));

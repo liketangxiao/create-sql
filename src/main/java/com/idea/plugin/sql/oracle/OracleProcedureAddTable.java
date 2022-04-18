@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class OracleProcedureAddTable implements IProcedureService {
 
     public static String comment =
-            "\n-- Oracle %s创建表\n";
+            "\n-- Oracle %s\n";
 
     public static String addTableProcedure =
             "DECLARE\n" +

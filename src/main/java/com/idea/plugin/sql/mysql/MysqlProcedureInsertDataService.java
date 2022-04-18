@@ -17,7 +17,8 @@ public class MysqlProcedureInsertDataService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureInsertData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         Pattern pattern = Pattern.compile("^'\\d{4}-\\d{2}-\\d{2}");
         for (String insertSql : tableInfoVO.insertData.split("\n")) {
             int s1 = insertSql.indexOf("(");

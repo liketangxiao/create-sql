@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class MysqlProcedureAddColumn implements IProcedureService {
 
     public static String comment =
-            "\n-- Mysql %s创建字段\n";
+            "\n-- Mysql %s\n";
 
     public static String addColumnProcedure =
             "DROP PROCEDURE IF EXISTS ADD_%s_COLUMN;\n" +

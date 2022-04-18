@@ -15,7 +15,8 @@ public class MysqlProcedureAddColumnService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureAddColumn();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增字段" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, tableInfoVO.tableName));
         for (FieldInfoVO fieldVO : tableInfoVO.fieldInfos) {
             String alterAddColumnCall = String.format(procedureService.getCall(),

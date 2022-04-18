@@ -18,7 +18,8 @@ public class MysqlProcedureAddTableService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureAddTable();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增表" : tableInfoVO.comment;
+        writeFile(path, String.format(procedureService.getComment(), comment));
         String procedure = procedureService.getProcedure();
         Integer length = tableInfoVO.fieldInfos.stream().map(fieldInfo -> fieldInfo.columnName.length()).max(Comparator.comparing(Integer::intValue)).get();
         String call = tableInfoVO.fieldInfos.stream().map(fieldVO -> {

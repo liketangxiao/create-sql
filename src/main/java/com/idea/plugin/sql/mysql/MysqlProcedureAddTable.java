@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class MysqlProcedureAddTable implements IProcedureService {
 
     public static String comment =
-            "\n-- Mysql %s创建表\n";
+            "\n-- Mysql %s\n";
 
     public static String addTableProcedure =
             "CREATE TABLE IF NOT EXISTS %s\n" +

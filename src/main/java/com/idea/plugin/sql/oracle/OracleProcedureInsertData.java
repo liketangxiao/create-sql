@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class OracleProcedureInsertData implements IProcedureService {
 
     public static String comment =
-            "\n-- Oracle %s数据重复插入\n";
+            "\n-- Oracle %s\n";
 
     public static String insertDataProcedure =
             "INSERT INTO %s(%s)\n" +

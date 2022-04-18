@@ -85,12 +85,9 @@ public class TableInfoVO {
     public TableInfoVO tableInfo(String tableName, String tableComment) {
         this.tableName = tableName.toUpperCase();
         if (StringUtils.isEmpty(tableComment)) {
-            this.tableComment = TranslatorConfig.translate(tableName.toUpperCase());
+            this.tableComment = TranslatorConfig.translate(tableName.toUpperCase()) + "表";
         } else {
             this.tableComment = tableComment;
-        }
-        if (StringUtils.isEmpty(tableComment)) {
-            this.comment = this.tableComment;
         }
         return this;
     }

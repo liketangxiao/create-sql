@@ -7,6 +7,6 @@ import com.idea.plugin.sql.support.exception.SqlException;
 public class MysqlProcedureInitialService extends BaseProcedureService {
 
     public void addProcedure(String path, TableInfoVO tableInfoVO) throws SqlException {
-        writeFile(path, "-- " + tableInfoVO.author + " " + tableInfoVO.fileName + "\n");
+        writeFile(path, "-- " + (tableInfoVO.author == null ? "" : tableInfoVO.author) + " " + tableInfoVO.fileName + "\n");
     }
 }

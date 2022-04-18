@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 public class MysqlProcedureAddIndex implements IProcedureService {
 
     public static String comment =
-            "\n-- Mysql %s创建索引\n";
+            "\n-- Mysql %s\n";
 
     public static String addIndexProcedure =
             "DROP PROCEDURE IF EXISTS ADD_%s_INDEX;\n" +
