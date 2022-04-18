@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum FieldTypeEnum {
-    STRING("VARCHAR(%s)", "NVARCHAR2(%s)"),
+    VARCHAR("VARCHAR(%s)", "NVARCHAR2(%s)"),
     TIMESTAMP("TIMESTAMP", "TIMESTAMP"),
     TEXT("TEXT", "CLOB"),
     NUMBER("DECIMAL(%s)", "NUMBER(%s)"),
@@ -35,7 +35,7 @@ public enum FieldTypeEnum {
         if (matcherCode.find()) {
             return matcherCode.group();
         }
-        if (STRING.equals(codeToEnum(code))) {
+        if (VARCHAR.equals(codeToEnum(code))) {
             return "32";
         }
         if (NUMBER.equals(codeToEnum(code))) {

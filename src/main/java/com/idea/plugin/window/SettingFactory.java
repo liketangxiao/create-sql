@@ -1,6 +1,5 @@
 package com.idea.plugin.window;
 
-import com.idea.plugin.ui.ReadingUI;
 import com.idea.plugin.ui.SettingUI;
 import com.intellij.openapi.options.SearchableConfigurable;
 import org.jetbrains.annotations.NotNull;

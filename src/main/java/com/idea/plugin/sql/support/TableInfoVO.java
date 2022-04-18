@@ -6,6 +6,7 @@ import com.idea.plugin.sql.support.enums.NullTypeEnum;
 import com.idea.plugin.sql.support.enums.PrimaryTypeEnum;
 import com.idea.plugin.sql.support.enums.ProcedureTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.idea.plugin.translator.TranslatorConfig;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class TableInfoVO {
     public String author;
     public List<ProcedureTypeEnum> procedureType = new ArrayList<>();
+    public String comment;
     public String filePath;
     public String fileName;
     public String jdbcUrl;
@@ -35,61 +37,23 @@ public class TableInfoVO {
         return new TableInfoVO();
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public List<ProcedureTypeEnum> getProcedureType() {
-        return procedureType;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public String getTableComment() {
-        return tableComment;
-    }
-
-    public String getInsertColumnName() {
-        return insertColumnName;
-    }
-
-    public String getInsertColumnParam() {
-        return insertColumnParam;
-    }
-
-    public String getInsertData() {
-        return insertData;
-    }
-
-    public String getInsertSql() {
-        return insertSql;
-    }
-
-    public List<IndexInfoVO> getIndexInfos() {
-        return indexInfos;
-    }
-
-    public List<FieldInfoVO> getFieldInfos() {
-        return fieldInfos;
-    }
-
-    public TableInfoVO author(String author) {
-        this.author = author;
+    public TableInfoVO procedureVO(ProcedureVO procedureVO) {
+        this.author = procedureVO.author;
+        this.fileName = procedureVO.fileName;
+        this.filePath = procedureVO.filePath;
+        this.jdbcUrl = procedureVO.jdbcUrl;
+        this.username = procedureVO.username;
+        this.password = procedureVO.password;
         return this;
     }
 
     public TableInfoVO procedureType(String procedureType) {
         this.procedureType = Arrays.stream(procedureType.split(",")).map(code -> ProcedureTypeEnum.codeToEnum(code.trim())).filter(Objects::nonNull).collect(Collectors.toList());
+        return this;
+    }
+
+    public TableInfoVO comment(String comment) {
+        this.comment = comment;
         return this;
     }
 
@@ -118,14 +82,16 @@ public class TableInfoVO {
         return this;
     }
 
-    public TableInfoVO tableName(String tableName) {
+    public TableInfoVO tableInfo(String tableName, String tableComment) {
         this.tableName = tableName.toUpperCase();
-        this.tableComment = tableName.toUpperCase();
-        return this;
-    }
-
-    public TableInfoVO tableComment(String tableComment) {
-        this.tableComment = tableComment;
+        if (StringUtils.isEmpty(tableComment)) {
+            this.tableComment = TranslatorConfig.translate(tableName.toUpperCase());
+        } else {
+            this.tableComment = tableComment;
+        }
+        if (StringUtils.isEmpty(tableComment)) {
+            this.comment = this.tableComment;
+        }
         return this;
     }
 
@@ -158,23 +124,45 @@ public class TableInfoVO {
         return this;
     }
 
-    public TableInfoVO fieldInfos(String columnName, String columnType, String comment, String arg) throws SqlException {
+    public TableInfoVO fieldInfos(String columnName, String columnType, String arg0, String arg1) throws SqlException {
         if (StringUtils.isEmpty(columnName) || StringUtils.isEmpty(columnType)) {
             return this;
         }
-        FieldInfoVO fieldInfoVO = FieldInfoVO.builder().columnName(columnName.toUpperCase()).columnType(FieldTypeEnum.codeToEnum(columnType.toUpperCase())).columnTypeArgs(FieldTypeEnum.codeGetArgs(columnType.toUpperCase())).comment(comment);
+        FieldInfoVO fieldInfoVO = FieldInfoVO.builder()
+                .columnName(columnName.toUpperCase())
+                .columnType(FieldTypeEnum.codeToEnum(columnType.toUpperCase()))
+                .columnTypeArgs(FieldTypeEnum.codeGetArgs(columnType.toUpperCase()));
+        Boolean isEnum = setAttri(arg0, fieldInfoVO);
+        if (!Boolean.TRUE.equals(isEnum) && !StringUtils.isEmpty(arg0)) {
+            fieldInfoVO.comment(arg0);
+        }
+        isEnum = setAttri(arg1, fieldInfoVO);
+        if (!Boolean.TRUE.equals(isEnum) && !StringUtils.isEmpty(arg1)) {
+            fieldInfoVO.comment(arg0);
+        }
+        if (StringUtils.isEmpty(fieldInfoVO.comment)) {
+            fieldInfoVO.comment(TranslatorConfig.translate(columnName.toUpperCase()));
+        }
+        this.fieldInfos.add(fieldInfoVO);
+        return this;
+    }
+
+    private Boolean setAttri(String arg, FieldInfoVO fieldInfoVO) {
+        Boolean isEnum = Boolean.FALSE;
         if (StringUtils.isNotEmpty(arg)) {
             arg = arg.toUpperCase();
             if (NullTypeEnum.codeToEnum(arg) != null) {
                 fieldInfoVO.nullType(NullTypeEnum.codeToEnum(arg));
+                isEnum = true;
             }
             if (PrimaryTypeEnum.codeToEnum(arg) != null) {
                 fieldInfoVO.primary(PrimaryTypeEnum.codeToEnum(arg));
                 fieldInfoVO.nullType(NullTypeEnum.NOT_NULL);
+                fieldInfoVO.comment("主键ID");
+                isEnum = true;
             }
         }
-        this.fieldInfos.add(fieldInfoVO);
-        return this;
+        return isEnum;
     }
 
 }

@@ -5,14 +5,6 @@ public class IndexInfoVO {
     public String indexName;
     public String indexColumnName;
 
-    public String getIndexName() {
-        return indexName;
-    }
-
-    public String getIndexColumnName() {
-        return indexColumnName;
-    }
-
     public static IndexInfoVO builder() {
         return new IndexInfoVO();
     }

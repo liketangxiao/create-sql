@@ -12,30 +12,6 @@ public class FieldInfoVO {
     public NullTypeEnum nullType = NullTypeEnum.NULL;
     public PrimaryTypeEnum primary = PrimaryTypeEnum.NON_PRIMARY;
 
-    public String getColumnName() {
-        return columnName;
-    }
-
-    public FieldTypeEnum getColumnType() {
-        return columnType;
-    }
-
-    public String getColumnTypeArgs() {
-        return columnTypeArgs;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public NullTypeEnum getNullType() {
-        return nullType;
-    }
-
-    public PrimaryTypeEnum getPrimary() {
-        return primary;
-    }
-
     public static FieldInfoVO builder() {
         return new FieldInfoVO();
     }

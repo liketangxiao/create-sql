@@ -5,7 +5,6 @@ import com.idea.plugin.sql.mysql.*;
 import com.idea.plugin.sql.oracle.*;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 public enum DataProcedureTypeEnum {
     MYSQL_INITIAL(ProcedureTypeEnum.INITIAL, DataTypeEnum.MYSQL, new MysqlProcedureInitialService()),

@@ -14,22 +14,22 @@ import java.util.stream.Collectors;
 public class MysqlProcedureAddTableService extends BaseProcedureService {
 
     public void addProcedure(String path, TableInfoVO tableInfoVO) throws SqlException {
-        if (StringUtils.isEmpty(path) || CollectionUtils.isEmpty(tableInfoVO.getFieldInfos())) {
+        if (StringUtils.isEmpty(path) || CollectionUtils.isEmpty(tableInfoVO.fieldInfos)) {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureAddTable();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.getTableComment()));
+        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
         String procedure = procedureService.getProcedure();
-        Integer length = tableInfoVO.getFieldInfos().stream().map(fieldInfo -> fieldInfo.getColumnName().length()).max(Comparator.comparing(Integer::intValue)).get();
-        String call = tableInfoVO.getFieldInfos().stream().map(fieldVO -> {
-                    String format = String.format(procedureService.getCall(), getColumnName(fieldVO.getColumnName(), length), fieldVO.getColumnType().getMtype(fieldVO.columnTypeArgs), fieldVO.getNullType().getCode(), fieldVO.getComment());
-                    if (PrimaryTypeEnum.PRIMARY.equals(fieldVO.getPrimary())) {
-                        format = format + fieldVO.getPrimary().getCode();
+        Integer length = tableInfoVO.fieldInfos.stream().map(fieldInfo -> fieldInfo.columnName.length()).max(Comparator.comparing(Integer::intValue)).get();
+        String call = tableInfoVO.fieldInfos.stream().map(fieldVO -> {
+                    String format = String.format(procedureService.getCall(), getColumnName(fieldVO.columnName, length), fieldVO.columnType.getMtype(fieldVO.columnTypeArgs), fieldVO.nullType.getCode(), fieldVO.comment);
+                    if (PrimaryTypeEnum.PRIMARY.equals(fieldVO.primary)) {
+                        format = format + fieldVO.primary.getCode();
                     }
                     return format;
                 })
                 .collect(Collectors.joining(",\n"));
-        procedure = String.format(procedure, tableInfoVO.getTableName(), call, tableInfoVO.getTableComment());
+        procedure = String.format(procedure, tableInfoVO.tableName, call, tableInfoVO.tableComment);
         writeFile(path, procedure);
     }
 

@@ -13,21 +13,21 @@ import java.util.stream.Collectors;
 public class OracleProcedureAddTableService extends BaseProcedureService {
 
     public void addProcedure(String path, TableInfoVO tableInfoVO) throws SqlException {
-        if (StringUtils.isEmpty(path) || CollectionUtils.isEmpty(tableInfoVO.getFieldInfos())) {
+        if (StringUtils.isEmpty(path) || CollectionUtils.isEmpty(tableInfoVO.fieldInfos)) {
             return;
         }
         OracleProcedureAddTable procedureService = new OracleProcedureAddTable();
         String procedure = procedureService.getProcedure();
-        Integer length = tableInfoVO.getFieldInfos().stream().map(fieldInfo -> fieldInfo.getColumnName().length()).max(Comparator.comparing(Integer::intValue)).get();
-        String call = tableInfoVO.getFieldInfos().stream().map(fieldVO -> {
-            String format = String.format(procedureService.getCall(), getColumnName(fieldVO.getColumnName(), length), fieldVO.getColumnType().getOtype(fieldVO.columnTypeArgs), fieldVO.getNullType().getCode());
-            if (PrimaryTypeEnum.PRIMARY.equals(fieldVO.getPrimary())) {
-                format = format + String.format("\n                    CONSTRAINT %s_PK PRIMARY KEY", tableInfoVO.getTableName());
+        Integer length = tableInfoVO.fieldInfos.stream().map(fieldInfo -> fieldInfo.columnName.length()).max(Comparator.comparing(Integer::intValue)).get();
+        String call = tableInfoVO.fieldInfos.stream().map(fieldVO -> {
+            String format = String.format(procedureService.getCall(), getColumnName(fieldVO.columnName, length), fieldVO.columnType.getOtype(fieldVO.columnTypeArgs), fieldVO.nullType.getCode());
+            if (PrimaryTypeEnum.PRIMARY.equals(fieldVO.primary)) {
+                format = format + String.format("\n                    CONSTRAINT %s_PK PRIMARY KEY", tableInfoVO.tableName);
             }
             return format;
         }).collect(Collectors.joining(",\n"));
-        String callComment = tableInfoVO.getFieldInfos().stream().map(fieldVO -> String.format(procedureService.getCallComment(), fieldVO.getColumnName(), fieldVO.getComment())).collect(Collectors.joining("\n"));
-        procedure = String.format(procedure, tableInfoVO.getTableName(), tableInfoVO.getTableName(), call, tableInfoVO.getTableName(), tableInfoVO.getTableComment(), callComment);
+        String callComment = tableInfoVO.fieldInfos.stream().map(fieldVO -> String.format(procedureService.getCallComment(), fieldVO.columnName, fieldVO.comment)).collect(Collectors.joining("\n"));
+        procedure = String.format(procedure, tableInfoVO.tableName, tableInfoVO.tableName, call, tableInfoVO.tableName, tableInfoVO.tableComment, callComment);
         writeFile(path, procedure);
     }
 

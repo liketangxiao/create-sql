@@ -7,10 +7,11 @@ import com.idea.plugin.sql.support.enums.DataTypeEnum;
 import com.idea.plugin.sql.support.enums.FileTypeEnum;
 import com.idea.plugin.sql.support.enums.ProcedureTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
-import com.idea.plugin.sql.utils.AssertUtils;
+import com.idea.plugin.utils.AssertUtils;
 import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -33,8 +34,8 @@ public class CreateSqlFile {
         try {
             Method[] procedureVOClassDeclaredMethods = procedureVOClass.getDeclaredMethods();
             Method[] tableInfoVOClassDeclaredMethods = tableInfoVOClass.getDeclaredMethods();
-            Map<String, Method> procedureMethodMap = Arrays.stream(procedureVOClassDeclaredMethods).collect(Collectors.toMap(method -> method.getName(), Function.identity()));
-            Map<String, Method> tableInfoMethodMap = Arrays.stream(tableInfoVOClassDeclaredMethods).collect(Collectors.toMap(method -> method.getName(), Function.identity()));
+            Map<String, Method> procedureMethodMap = Arrays.stream(procedureVOClassDeclaredMethods).collect(Collectors.toMap(Method::getName, Function.identity()));
+            Map<String, Method> tableInfoMethodMap = Arrays.stream(tableInfoVOClassDeclaredMethods).collect(Collectors.toMap(Method::getName, Function.identity()));
             StringBuilder insertSql = new StringBuilder();
             for (String property : properties) {
                 property = property.trim();
@@ -90,7 +91,7 @@ public class CreateSqlFile {
             }
             try {
                 createSqlFile(procedureVO);
-                Messages.showMessageDialog("sql文件创建成功: " + procedureVO.getFileName(), "正确", Messages.getInformationIcon());
+                Messages.showMessageDialog("sql文件创建成功: " + procedureVO.fileName, "正确", Messages.getInformationIcon());
             } catch (Exception ex) {
                 Messages.showErrorDialog("sql文件创建失败: " + ex.getLocalizedMessage(), "错误");
             }
@@ -104,19 +105,14 @@ public class CreateSqlFile {
     }
 
     public void createSqlFile(ProcedureVO procedureVO) throws SqlException {
-        AssertUtils.assertIsTrue(StringUtils.isNotEmpty(procedureVO.getFilePath()), "文件路径不能为空");
-        List<FileTypeEnum> fileTypeEnums = procedureVO.getTableInfoVOS().stream().flatMap(tableInfoVO -> tableInfoVO.getProcedureType().stream()).map(ProcedureTypeEnum::getFileType).distinct().collect(Collectors.toList());
+        AssertUtils.assertIsTrue(StringUtils.isNotEmpty(procedureVO.filePath), "文件路径不能为空");
+        List<FileTypeEnum> fileTypeEnums = procedureVO.tableInfoVOS.stream().flatMap(tableInfoVO -> tableInfoVO.procedureType.stream()).map(ProcedureTypeEnum::getFileType).distinct().collect(Collectors.toList());
         FileTypeEnum fileType = FileTypeEnum.getFirstFileType(fileTypeEnums);
         LocalDateTime localDateTime = LocalDateTime.now();
-        String mysqlPath = getFilePath(DataTypeEnum.MYSQL, fileType, procedureVO.getFilePath(), procedureVO.getFileName(), localDateTime);
-        String oralcePath = getFilePath(DataTypeEnum.ORACLE, fileType, procedureVO.getFilePath(), procedureVO.getFileName(), localDateTime);
-        for (TableInfoVO tableInfoVO : procedureVO.getTableInfoVOS()) {
-            tableInfoVO.author(procedureVO.author);
-            tableInfoVO.fileName(procedureVO.fileName);
-            tableInfoVO.filePath(procedureVO.filePath);
-            tableInfoVO.jdbcUrl(procedureVO.jdbcUrl);
-            tableInfoVO.username(procedureVO.username);
-            tableInfoVO.password(procedureVO.password);
+        String mysqlPath = getFilePath(DataTypeEnum.MYSQL, fileType, procedureVO.filePath, procedureVO.fileName, localDateTime);
+        String oralcePath = getFilePath(DataTypeEnum.ORACLE, fileType, procedureVO.filePath, procedureVO.fileName, localDateTime);
+        for (TableInfoVO tableInfoVO : procedureVO.tableInfoVOS) {
+            tableInfoVO.procedureVO(procedureVO);
             for (ProcedureTypeEnum procedureTypeEnum : tableInfoVO.procedureType) {
                 if (procedureTypeEnum != null) {
                     BaseProcedureService mysqlProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.MYSQL);
@@ -133,9 +129,19 @@ public class CreateSqlFile {
     }
 
 
-    public String getFilePath(DataTypeEnum dataType, FileTypeEnum fileType, String filePath, String fileName, LocalDateTime localDateTime) {
+    public String getFilePath(DataTypeEnum dataType, FileTypeEnum fileType, String filePath, String fileName, LocalDateTime localDateTime) throws SqlException {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm.ss");
-        return filePath + "/" + dataType.getCode() + "/V" + dateFormat.format(localDateTime) + "__" + fileType.getCode() + "." + fileName + "_" + dataType.getCode() + ".sql";
+        File file = new File(filePath);
+        filePath = filePath + "/" + dataType.getCode();
+        if (!file.exists() && !file.isDirectory()) {
+            throw new SqlException(String.format("文件%s不存在", filePath));
+        } else {
+            file = new File(filePath);
+            if (!file.exists() && !file.isDirectory()) {
+                file.mkdir();
+            }
+        }
+        return filePath + "/V" + dateFormat.format(localDateTime) + "__" + fileType.getCode() + "." + fileName + "_" + dataType.getCode() + ".sql";
     }
 
 }

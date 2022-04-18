@@ -23,7 +23,7 @@ public enum ProcedureTypeEnum {
     }
 
     public static ProcedureTypeEnum codeToEnum(String code) {
-        return Arrays.stream(ProcedureTypeEnum.values()).filter(procedureTypeEnum -> procedureTypeEnum.name().equals(code)).findAny().orElse(null);
+        return Arrays.stream(ProcedureTypeEnum.values()).filter(procedureTypeEnum -> procedureTypeEnum.name().equals(code.toUpperCase())).findAny().orElse(null);
     }
 
 }

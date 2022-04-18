@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.DataTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
-import com.idea.plugin.sql.utils.DBProcedureUtils;
+import com.idea.plugin.utils.DBProcedureUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
@@ -24,10 +24,10 @@ public class MysqlProcedureInsertSqlService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureInsertData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.getTableComment()));
+        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
         Connection connection = DBProcedureUtils.getConnection(tableInfoVO);
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(tableInfoVO.getInsertSql());
+            PreparedStatement preparedStatement = connection.prepareStatement(tableInfoVO.insertSql);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<String> codeList = new ArrayList<>();
             Set<String> columnClassList = new HashSet<>();
@@ -42,7 +42,7 @@ public class MysqlProcedureInsertSqlService extends BaseProcedureService {
                 String idValue = "'" + resultSet.getString(1) + "'";
                 List<String> rowValues = DBProcedureUtils.getRowValues(DataTypeEnum.MYSQL, resultSet, metaData, null, null, null);
                 String values = String.join(", ", rowValues);
-                writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.getTableName(), codes, values, tableInfoVO.getTableName(), idCode, idValue));
+                writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);

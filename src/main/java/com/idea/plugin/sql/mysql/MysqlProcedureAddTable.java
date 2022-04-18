@@ -8,10 +8,10 @@ public class MysqlProcedureAddTable implements IProcedureService {
             "\n-- Mysql %s创建表\n";
 
     public static String addTableProcedure =
-                    "CREATE TABLE IF NOT EXISTS %s\n" +
+            "CREATE TABLE IF NOT EXISTS %s\n" +
                     "(\n" +
                     "%s\n" +
-                    ") COMMENT '%s';\n"+
+                    ") COMMENT '%s';\n" +
                     "\n";
     public static String addTableCall = "    %s %s %s COMMENT '%s'";
 
@@ -19,7 +19,7 @@ public class MysqlProcedureAddTable implements IProcedureService {
     public String getComment() {
         return comment;
     }
-    
+
     @Override
     public String getProcedure() {
         return addTableProcedure;

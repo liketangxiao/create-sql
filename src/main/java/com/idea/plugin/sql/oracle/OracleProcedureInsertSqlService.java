@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.DataTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
-import com.idea.plugin.sql.utils.DBProcedureUtils;
+import com.idea.plugin.utils.DBProcedureUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,10 +23,10 @@ public class OracleProcedureInsertSqlService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new OracleProcedureInsertData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.getTableComment()));
+        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
         Connection connection = DBProcedureUtils.getConnection(tableInfoVO);
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(tableInfoVO.getInsertSql());
+            PreparedStatement preparedStatement = connection.prepareStatement(tableInfoVO.insertSql);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<String> codeList = new ArrayList<>();
             ResultSetMetaData metaData = resultSet.getMetaData();
@@ -46,9 +46,9 @@ public class OracleProcedureInsertSqlService extends BaseProcedureService {
                     String declareColumn = String.join("", declareColumns);
                     String dbmsLobCreate = String.join("", dbmsLobCreates);
                     String dbmsLobApend = String.join("", dbmsLobApends);
-                    writeFile(path, String.format(procedureService.getCall(), declareColumn,dbmsLobCreate,dbmsLobApend, tableInfoVO.getTableName(), codes, values, tableInfoVO.getTableName(), idCode, idValue));
+                    writeFile(path, String.format(procedureService.getCall(), declareColumn, dbmsLobCreate, dbmsLobApend, tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
                 } else {
-                    writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.getTableName(), codes, values, tableInfoVO.getTableName(), idCode, idValue));
+                    writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
                 }
             }
         } catch (Exception e) {

@@ -16,8 +16,8 @@ public class MysqlProcedureAddDataService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureAddData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.getTableComment()));
-        String[] columnNameArr = tableInfoVO.getInsertColumnName().split(",");
+        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        String[] columnNameArr = tableInfoVO.insertColumnName.split(",");
         String columnNameDeclare = Arrays.stream(columnNameArr)
                 .map(columnName -> "    DECLARE V_" + columnName.trim() + " TINYTEXT;").collect(Collectors.joining("\n"));
         String columnNameInto = Arrays.stream(columnNameArr)
@@ -26,18 +26,18 @@ public class MysqlProcedureAddDataService extends BaseProcedureService {
                 .map(columnName -> "V_" + columnName.trim()).collect(Collectors.joining(", "));
         String columnParams = "P_PARAM TINYTEXT";
         String columnCondition = "PARAM = P_PARAM";
-        if (tableInfoVO.getInsertColumnParam() != null) {
-            String[] columnParamArr = tableInfoVO.getInsertColumnParam().split(",");
+        if (tableInfoVO.insertColumnParam != null) {
+            String[] columnParamArr = tableInfoVO.insertColumnParam.split(",");
             columnParams = Arrays.stream(columnParamArr)
                     .map(columnParam -> "P_" + columnParam.trim() + " TINYTEXT").collect(Collectors.joining(", "));
             columnCondition = columnParamArr[0].trim() + " = " + "P_" + columnParamArr[0].trim();
         }
         String procedure = String.format(procedureService.getProcedure(),
-                tableInfoVO.getTableName(), tableInfoVO.getTableName(), columnParams, columnNameDeclare,
-                tableInfoVO.getTableName(), columnCondition, tableInfoVO.getTableName(), columnCondition,
-                columnNameInto, tableInfoVO.getTableName(), tableInfoVO.getInsertColumnName(), columnNameValue);
+                tableInfoVO.tableName, tableInfoVO.tableName, columnParams, columnNameDeclare,
+                tableInfoVO.tableName, columnCondition, tableInfoVO.tableName, columnCondition,
+                columnNameInto, tableInfoVO.tableName, tableInfoVO.insertColumnName, columnNameValue);
         writeFile(path, procedure);
-        writeFile(path, String.format(procedureService.getCall(), tableInfoVO.getTableName()));
-        writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.getTableName()));
+        writeFile(path, String.format(procedureService.getCall(), tableInfoVO.tableName));
+        writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
     }
 }

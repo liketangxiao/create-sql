@@ -10,9 +10,20 @@
     <description>
         <![CDATA[
         <h2>创建可重复执行SQL脚本</h2>
+        <a href="https://github.com/liketangxiao/create-sql">create-sql source code and document</a><br>
         <ul>
-        <a href="https://doc.weixin.qq.com/doc/w3_ANsADwZcAOk8rgfVfY2SLO9idOfx0?scode=AMYAEgcaAAwaCEg8iWANsADwZcAOk">插件使用文档</a><br>
-        <a href="https://doc.weixin.qq.com/doc/w3_ANsADwZcAOkKsyYN8phQKm2DbbwXU?scode=AMYAEgcaAAwO8A3a1HANsADwZcAOk">插件demo文档</a><br>
+        更新日志
+        - v1.02
+          - 支持表名和列表根据定义编码自动翻译成注释
+        - v1.01
+          - 优化支持数据库查询数据生成可重复执行sql语句
+        - v1.0
+          - 支持生成以下生成脚本
+            - ADD_TABLE(创建表),
+            - ADD_INDEX(创建索引),
+            - ADD_COLUMN(创建字段),
+            - ADD_DATA(插入数据存储过程需自己编辑),
+            - INSERT_DATA(插入可重复执行数据)
         </ul>
         ]]>
     </description>
@@ -32,11 +43,11 @@
 
     <actions>
         <action id="HelloWorld-project" class="com.idea.plugin.popup.ProjectViewPopupAction"
-                text="FsscSqlFile" description="CreateSqlFile">
+                text="FsscSqlFile" description="CreateSqlFile" icon="/img/logo.svg">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
         <action id="HelloWorld-editor" class="com.idea.plugin.popup.EditorPopupAction"
-                text="FsscSqlFile" description="CreateSqlFile">
+                text="FsscSqlFile" description="CreateSqlFile" icon="/img/logo.svg">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>

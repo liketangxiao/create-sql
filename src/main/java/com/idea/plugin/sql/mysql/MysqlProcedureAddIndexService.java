@@ -11,16 +11,16 @@ import org.apache.commons.lang3.StringUtils;
 public class MysqlProcedureAddIndexService extends BaseProcedureService {
 
     public void addProcedure(String path, TableInfoVO tableInfoVO) throws SqlException {
-        if (StringUtils.isEmpty(path) || CollectionUtils.isEmpty(tableInfoVO.getIndexInfos())) {
+        if (StringUtils.isEmpty(path) || CollectionUtils.isEmpty(tableInfoVO.indexInfos)) {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureAddIndex();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.getTableComment()));
-        writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.getTableName(), tableInfoVO.getTableName()));
-        for (IndexInfoVO indexInfoVO : tableInfoVO.getIndexInfos()) {
-            String alterAddIndexCall = String.format(procedureService.getCall(), tableInfoVO.getTableName(), indexInfoVO.getIndexName(), indexInfoVO.getIndexColumnName());
+        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
+        writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, tableInfoVO.tableName));
+        for (IndexInfoVO indexInfoVO : tableInfoVO.indexInfos) {
+            String alterAddIndexCall = String.format(procedureService.getCall(), tableInfoVO.tableName, indexInfoVO.indexName, indexInfoVO.indexColumnName);
             writeFile(path, alterAddIndexCall);
         }
-        writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.getTableName()));
+        writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
     }
 }

@@ -1,4 +1,4 @@
-package com.idea.plugin.sql.utils;
+package com.idea.plugin.utils;
 
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.DataTypeEnum;

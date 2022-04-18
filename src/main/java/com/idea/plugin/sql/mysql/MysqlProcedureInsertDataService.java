@@ -17,7 +17,7 @@ public class MysqlProcedureInsertDataService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new MysqlProcedureInsertData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.getTableComment()));
+        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
         Pattern pattern = Pattern.compile("^'\\d{4}-\\d{2}-\\d{2}");
         for (String insertSql : tableInfoVO.insertData.split("\n")) {
             int s1 = insertSql.indexOf("(");
@@ -41,7 +41,7 @@ public class MysqlProcedureInsertDataService extends BaseProcedureService {
                 }
             }
             values = String.join(", ", valueList);
-            writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.getTableName(), codes, values, tableInfoVO.getTableName(), idCode, idValue));
+            writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
         }
     }
 }

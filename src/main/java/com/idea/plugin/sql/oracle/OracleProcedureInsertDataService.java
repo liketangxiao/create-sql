@@ -17,9 +17,9 @@ public class OracleProcedureInsertDataService extends BaseProcedureService {
             return;
         }
         IProcedureService procedureService = new OracleProcedureInsertData();
-        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.getTableComment()));
+        writeFile(path, String.format(procedureService.getComment(), tableInfoVO.comment));
         Pattern pattern = Pattern.compile("^'\\d{4}-\\d{2}-\\d{2}");
-        for (String insertSql : tableInfoVO.getInsertData().split("\n")) {
+        for (String insertSql : tableInfoVO.insertData.split("\n")) {
             int s1 = insertSql.indexOf("(");
             int s2 = insertSql.indexOf(")");
             int s3 = insertSql.lastIndexOf("(");
@@ -45,7 +45,7 @@ public class OracleProcedureInsertDataService extends BaseProcedureService {
                 }
             }
             values = String.join(", ", valueList);
-            writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.getTableName(), codes, values, tableInfoVO.getTableName(), idCode, idValue));
+            writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
         }
     }
 }
