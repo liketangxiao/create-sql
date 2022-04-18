@@ -11,20 +11,6 @@
         <![CDATA[
         <h2>创建可重复执行SQL脚本</h2>
         <a href="https://github.com/liketangxiao/create-sql">create-sql source code and document</a><br>
-        <ul>
-        更新日志
-        - v1.02
-          -
-        - v1.01
-          -
-        - v1.0
-          - 支持生成以下生成脚本
-            -
-            -
-            -
-            -
-            -
-        </ul>
         ]]>
     </description>
     <change-notes><![CDATA[
