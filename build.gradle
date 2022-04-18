@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.idea.plugin'
-version '1.0'
+version '1.02'
 
 // 高版本默认使用java11，为了避免不兼容的问题
 sourceCompatibility = 1.8
