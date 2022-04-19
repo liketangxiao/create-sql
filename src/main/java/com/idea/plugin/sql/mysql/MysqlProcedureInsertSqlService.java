@@ -40,7 +40,7 @@ public class MysqlProcedureInsertSqlService extends BaseProcedureService {
             }
             String codes = String.join(", ", codeList);
             while (resultSet.next()) {
-                String idValue = "'" + resultSet.getString(1) + "'";
+                String idValue = DBProcedureUtils.getIdValue(resultSet.getString(1));
                 List<String> rowValues = DBProcedureUtils.getRowValues(DataTypeEnum.MYSQL, resultSet, metaData, null, null, null);
                 String values = String.join(", ", rowValues);
                 writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));

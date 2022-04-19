@@ -10,10 +10,8 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class DBProcedureUtils {
 
@@ -102,4 +100,10 @@ public class DBProcedureUtils {
         }
     }
 
+    public static String getIdValue(String value) {
+        if (StringUtils.isEmpty(value)) {
+            value = UUID.randomUUID().toString().replace("-", "");
+        }
+        return "'" + value + "'";
+    }
 }

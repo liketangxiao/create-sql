@@ -37,7 +37,7 @@ public class OracleProcedureInsertSqlService extends BaseProcedureService {
             }
             String codes = String.join(", ", codeList);
             while (resultSet.next()) {
-                String idValue = "'" + resultSet.getString(1) + "'";
+                String idValue = DBProcedureUtils.getIdValue(resultSet.getString(1));
                 List<String> declareColumns = new ArrayList<>();
                 List<String> dbmsLobCreates = new ArrayList<>();
                 List<String> dbmsLobApends = new ArrayList<>();
