@@ -12,6 +12,7 @@ import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -42,7 +43,16 @@ public class CreateSqlFile {
                 if (StringUtils.isEmpty(property) || property.startsWith("#") || property.startsWith("--")) {
                     continue;
                 }
+                property = property.replaceAll("，", ",");
+                property = property.replaceAll("；", ";");
+                property = property.replaceFirst("：", ":");
                 if (property.startsWith("procedureType")) {
+                    if (StringUtils.isNotEmpty(insertSql)) {
+                        String sql = insertSql.toString().replace(";", "");
+                        insertSql = new StringBuilder();
+                        Method tableInfoMethod = tableInfoMethodMap.get("insertSql");
+                        tableInfoMethod.invoke(tableInfoVO, sql);
+                    }
                     tableInfoVO = TableInfoVO.builder();
                     procedureVO.tableInfoVOS(tableInfoVO);
                 }
@@ -104,17 +114,25 @@ public class CreateSqlFile {
 
     }
 
-    public void createSqlFile(ProcedureVO procedureVO) throws SqlException {
+    public void createSqlFile(ProcedureVO procedureVO) throws SqlException, IllegalAccessException, NoSuchFieldException {
         AssertUtils.assertIsTrue(StringUtils.isNotEmpty(procedureVO.filePath), "文件路径不能为空");
         List<FileTypeEnum> fileTypeEnums = procedureVO.tableInfoVOS.stream().flatMap(tableInfoVO -> tableInfoVO.procedureType.stream()).map(ProcedureTypeEnum::getFileType).distinct().collect(Collectors.toList());
         FileTypeEnum fileType = FileTypeEnum.getFirstFileType(fileTypeEnums);
         LocalDateTime localDateTime = LocalDateTime.now();
         String mysqlPath = getFilePath(DataTypeEnum.MYSQL, fileType, procedureVO.filePath, procedureVO.fileName, localDateTime);
         String oralcePath = getFilePath(DataTypeEnum.ORACLE, fileType, procedureVO.filePath, procedureVO.fileName, localDateTime);
+        Class<TableInfoVO> tableInfoVOClass = TableInfoVO.class;
         for (TableInfoVO tableInfoVO : procedureVO.tableInfoVOS) {
             tableInfoVO.procedureVO(procedureVO);
             for (ProcedureTypeEnum procedureTypeEnum : tableInfoVO.procedureType) {
                 if (procedureTypeEnum != null) {
+                    for (String fieldName : procedureTypeEnum.getMustFieldList()) {
+                        Field field = tableInfoVOClass.getField(fieldName);
+                        Object value = field.get(tableInfoVO);
+                        if (value == null || StringUtils.isEmpty(value.toString())) {
+                            throw new SqlException(String.format("生成脚本类型：%s 属性值：%s不能为空", procedureTypeEnum.name(), fieldName));
+                        }
+                    }
                     BaseProcedureService mysqlProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.MYSQL);
                     BaseProcedureService oralceProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.ORACLE);
                     if (mysqlProcedureService != null) {
