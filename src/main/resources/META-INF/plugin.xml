@@ -31,7 +31,7 @@
           <li>ADD_DATA(插入数据存储过程需自己编辑)</li>
           <li>INSERT_DATA(插入可重复执行数据)</li>
       </ul>
-          ]]>
+    ]]>
     </change-notes>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html

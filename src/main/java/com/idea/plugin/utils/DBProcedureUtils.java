@@ -11,14 +11,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
 
 public class DBProcedureUtils {
 
-    public static List<String> getRowValues(DataTypeEnum dataTypeEnum, ResultSet resultSet, ResultSetMetaData metaData, List<String> declareColumns, List<String> dbmsLobCreates, List<String> dbmsLobApends) throws SQLException {
-        List<String> valueList = new ArrayList<>();
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            String columnLabel = metaData.getColumnLabel(i);
+    public static void getRowValues(List<String> valueList, DataTypeEnum dataTypeEnum, ResultSet resultSet, ResultSetMetaData metaData, List<String> declareColumns, List<String> dbmsLobCreates, List<String> dbmsLobApends) throws SQLException {
+        for (int i = 2; i <= metaData.getColumnCount(); i++) {
+            String columnLabel = metaData.getColumnLabel(i).toUpperCase();
             String columnClassName = metaData.getColumnClassName(i);
             Object value = resultSet.getString(i);
             if (value != null && value != "null") {
@@ -74,7 +75,6 @@ public class DBProcedureUtils {
             }
             valueList.add(resultVlue);
         }
-        return valueList;
     }
 
     public static Connection getConnection(TableInfoVO tableInfoVO) {

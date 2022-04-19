@@ -37,11 +37,13 @@ public class OracleProcedureInsertSqlService extends BaseProcedureService {
             }
             String codes = String.join(", ", codeList);
             while (resultSet.next()) {
-                String idValue = DBProcedureUtils.getIdValue(resultSet.getString(1));
+                List<String> rowValues=new ArrayList<>();
                 List<String> declareColumns = new ArrayList<>();
                 List<String> dbmsLobCreates = new ArrayList<>();
                 List<String> dbmsLobApends = new ArrayList<>();
-                List<String> rowValues = DBProcedureUtils.getRowValues(DataTypeEnum.ORACLE, resultSet, metaData, declareColumns, dbmsLobCreates, dbmsLobApends);
+                String idValue = DBProcedureUtils.getIdValue(resultSet.getString(1));
+                rowValues.add(idValue);
+                DBProcedureUtils.getRowValues(rowValues, DataTypeEnum.ORACLE, resultSet, metaData, declareColumns, dbmsLobCreates, dbmsLobApends);
                 String values = String.join(", ", rowValues);
                 if (CollectionUtils.isNotEmpty(declareColumns)) {
                     String declareColumn = String.join("", declareColumns);
