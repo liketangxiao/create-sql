@@ -101,7 +101,7 @@ public class DBProcedureUtils {
     }
 
     public static String getIdValue(String value) {
-        if (StringUtils.isEmpty(value)) {
+        if (StringUtils.isEmpty(value) || "UUID".equalsIgnoreCase(value)) {
             value = UUID.randomUUID().toString().replace("-", "");
         }
         return "'" + value + "'";
