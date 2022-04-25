@@ -1,21 +1,24 @@
 package com.idea.plugin.popup;
 
+import com.idea.plugin.sql.support.ProcedureVO;
 import com.idea.plugin.utils.ActionUtils;
+import com.idea.plugin.utils.CreateFileUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 右键项目文件时触发
+ * 右键文件内容时触发
  *
  * @author yanzhao
  * @date 2022/1/26 13:44
  * @since 1.0.0
  */
-public class ProjectViewPopupAction extends AnAction {
+public class JavaFilePopupAction extends AnAction {
 
     /**
      * 当菜单或者按钮被点击时，触发这个方法
@@ -28,8 +31,15 @@ public class ProjectViewPopupAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         PsiFile requiredData = e.getRequiredData(CommonDataKeys.PSI_FILE);
         Document document = requiredData.getViewProvider().getDocument();
-        ActionUtils.readProcedureByText(document.getText());
+        ProcedureVO procedureVO = ActionUtils.readProcedureByText(document.getText());
+        try {
+            CreateFileUtils.generatorJavaFile(procedureVO);
+            Messages.showMessageDialog("文件创建成功, 路径: " + procedureVO.modulePath, "正确", Messages.getInformationIcon());
+        } catch (Exception ex) {
+            Messages.showErrorDialog("文件创建失败: " + ex.getLocalizedMessage(), "错误");
+        }
     }
+
 
     /**
      * 显示菜单时，idea会调用此方法
@@ -43,4 +53,5 @@ public class ProjectViewPopupAction extends AnAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
     }
+
 }

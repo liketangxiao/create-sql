@@ -5,7 +5,6 @@
     <name>create-sql</name>
     <!--  -->
     <vendor email=""></vendor>
-    <!--    <idea-version since-build="191.0"/>-->
     <!-- 插件的描述 -->
     <description>
         <![CDATA[
@@ -48,13 +47,21 @@
     </extensions>
 
     <actions>
-        <action id="HelloWorld-project" class="com.idea.plugin.popup.ProjectViewPopupAction"
+        <action id="EditorCreateSqlFile" class="com.idea.plugin.popup.SqlFilePopupAction"
                 text="FsscSqlFile" description="CreateSqlFile" icon="/img/logo.svg">
+            <add-to-group group-id="GenerateGroup" anchor="last"/>
+        </action>
+        <group id="Project.View.CreateFile.Group.Main" text="CreateFile"
+               description="Group of Create File"
+               popup="true"
+               icon="/img/file_view.svg">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-        </action>
-        <action id="HelloWorld-editor" class="com.idea.plugin.popup.EditorPopupAction"
-                text="FsscSqlFile" description="CreateSqlFile" icon="/img/logo.svg">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
+            <action id="CreateSqlFile" class="com.idea.plugin.popup.SqlFilePopupAction"
+                    text="SqlFile" description="Create Sql File" icon="/img/sql.svg">
+            </action>
+            <action id="CreateJavaFile" class="com.idea.plugin.popup.JavaFilePopupAction"
+                    text="JavaFile" description="Create Orm File" icon="/img/java.svg">
+            </action>
+        </group>
     </actions>
 </idea-plugin>

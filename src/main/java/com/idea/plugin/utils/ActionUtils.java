@@ -1,31 +1,19 @@
-package com.idea.plugin.sql;
+package com.idea.plugin.utils;
 
 import com.idea.plugin.sql.support.ProcedureVO;
 import com.idea.plugin.sql.support.TableInfoVO;
-import com.idea.plugin.sql.support.enums.DataProcedureTypeEnum;
-import com.idea.plugin.sql.support.enums.DataTypeEnum;
-import com.idea.plugin.sql.support.enums.FileTypeEnum;
-import com.idea.plugin.sql.support.enums.ProcedureTypeEnum;
-import com.idea.plugin.sql.support.exception.SqlException;
-import com.idea.plugin.utils.AssertUtils;
 import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class CreateSqlFile {
-
-    public void createSqlFileByText(String text) {
+public class ActionUtils {
+    public static ProcedureVO readProcedureByText(String text) {
         String[] properties = text.split("\n");
         ProcedureVO procedureVO = ProcedureVO.builder();
         TableInfoVO tableInfoVO = null;
@@ -54,6 +42,7 @@ public class CreateSqlFile {
                         tableInfoMethod.invoke(tableInfoVO, sql);
                     }
                     tableInfoVO = TableInfoVO.builder();
+                    tableInfoVO.procedureVO(procedureVO);
                     procedureVO.tableInfoVOS(tableInfoVO);
                 }
                 if (tableInfoVO != null && (property.toUpperCase().startsWith("INSERT INTO"))) {
@@ -63,10 +52,11 @@ public class CreateSqlFile {
                     if (property.startsWith("insertSql") || insertSql.length() > 0) {
                         insertSql.append(property.substring(index + 1)).append(" ");
                         String sql = insertSql.toString().trim();
+                        Method tableInfoMethod = tableInfoMethodMap.get("insertSql");
+                        tableInfoMethod.invoke(tableInfoVO, sql);
                         if (sql.endsWith(";")) {
                             sql = insertSql.toString().replace(";", "");
                             insertSql = new StringBuilder();
-                            Method tableInfoMethod = tableInfoMethodMap.get("insertSql");
                             tableInfoMethod.invoke(tableInfoVO, sql);
                         }
                     } else {
@@ -99,67 +89,12 @@ public class CreateSqlFile {
                     }
                 }
             }
-            try {
-                createSqlFile(procedureVO);
-                Messages.showMessageDialog("sql文件创建成功: " + procedureVO.fileName, "正确", Messages.getInformationIcon());
-            } catch (Exception ex) {
-                Messages.showErrorDialog("sql文件创建失败: " + ex.getLocalizedMessage(), "错误");
-            }
         } catch (Exception e) {
             if (e instanceof InvocationTargetException) {
                 Messages.showErrorDialog("配置文件转换失败: " + methodName + " " + ((InvocationTargetException) e).getTargetException().getLocalizedMessage(), "错误");
             }
             Messages.showErrorDialog("配置文件转换失败: " + methodName + " " + e.getLocalizedMessage(), "错误");
         }
-
+        return procedureVO;
     }
-
-    public void createSqlFile(ProcedureVO procedureVO) throws SqlException, IllegalAccessException, NoSuchFieldException {
-        AssertUtils.assertIsTrue(StringUtils.isNotEmpty(procedureVO.filePath), "文件路径不能为空");
-        List<FileTypeEnum> fileTypeEnums = procedureVO.tableInfoVOS.stream().flatMap(tableInfoVO -> tableInfoVO.procedureType.stream()).map(ProcedureTypeEnum::getFileType).distinct().collect(Collectors.toList());
-        FileTypeEnum fileType = FileTypeEnum.getFirstFileType(fileTypeEnums);
-        LocalDateTime localDateTime = LocalDateTime.now();
-        String mysqlPath = getFilePath(DataTypeEnum.MYSQL, fileType, procedureVO.filePath, procedureVO.fileName, localDateTime);
-        String oralcePath = getFilePath(DataTypeEnum.ORACLE, fileType, procedureVO.filePath, procedureVO.fileName, localDateTime);
-        Class<TableInfoVO> tableInfoVOClass = TableInfoVO.class;
-        for (TableInfoVO tableInfoVO : procedureVO.tableInfoVOS) {
-            tableInfoVO.procedureVO(procedureVO);
-            for (ProcedureTypeEnum procedureTypeEnum : tableInfoVO.procedureType) {
-                if (procedureTypeEnum != null) {
-                    for (String fieldName : procedureTypeEnum.getMustFieldList()) {
-                        Field field = tableInfoVOClass.getField(fieldName);
-                        Object value = field.get(tableInfoVO);
-                        if (value == null || StringUtils.isEmpty(value.toString())) {
-                            throw new SqlException(String.format("生成脚本类型：%s 属性值：%s不能为空", procedureTypeEnum.name(), fieldName));
-                        }
-                    }
-                    BaseProcedureService mysqlProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.MYSQL);
-                    BaseProcedureService oralceProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.ORACLE);
-                    if (mysqlProcedureService != null) {
-                        mysqlProcedureService.addProcedure(mysqlPath, tableInfoVO);
-                    }
-                    if (oralceProcedureService != null) {
-                        oralceProcedureService.addProcedure(oralcePath, tableInfoVO);
-                    }
-                }
-            }
-        }
-    }
-
-
-    public String getFilePath(DataTypeEnum dataType, FileTypeEnum fileType, String filePath, String fileName, LocalDateTime localDateTime) throws SqlException {
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm.ss");
-        File file = new File(filePath);
-        filePath = filePath + "/" + dataType.getCode();
-        if (!file.exists() && !file.isDirectory()) {
-            throw new SqlException(String.format("文件%s不存在", filePath));
-        } else {
-            file = new File(filePath);
-            if (!file.exists() && !file.isDirectory()) {
-                file.mkdir();
-            }
-        }
-        return filePath + "/V" + dateFormat.format(localDateTime) + "__" + fileType.getCode() + "." + fileName + "_" + dataType.getCode() + ".sql";
-    }
-
 }

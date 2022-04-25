@@ -1,12 +1,13 @@
 package com.idea.plugin.popup;
 
-import com.idea.plugin.sql.CreateSqlFile;
+import com.idea.plugin.sql.support.ProcedureVO;
+import com.idea.plugin.utils.ActionUtils;
+import com.idea.plugin.utils.CreateFileUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,9 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * @date 2022/1/26 13:44
  * @since 1.0.0
  */
-public class EditorPopupAction extends AnAction {
-
-    static String SQL_PATH = "D:/git/ECS/DEV/java-web/sql/fssc/";
+public class SqlFilePopupAction extends AnAction {
 
     /**
      * 当菜单或者按钮被点击时，触发这个方法
@@ -30,12 +29,15 @@ public class EditorPopupAction extends AnAction {
      */
     @Override
     public void actionPerformed(AnActionEvent e) {
-        Project project = e.getRequiredData(CommonDataKeys.PROJECT);
-        DataContext dataContext = e.getDataContext();
         PsiFile requiredData = e.getRequiredData(CommonDataKeys.PSI_FILE);
         Document document = requiredData.getViewProvider().getDocument();
-        CreateSqlFile createSqlFile = new CreateSqlFile();
-        createSqlFile.createSqlFileByText(document.getText());
+        ProcedureVO procedureVO = ActionUtils.readProcedureByText(document.getText());
+        try {
+            CreateFileUtils.generatorSqlFile(procedureVO);
+            Messages.showMessageDialog("文件创建成功: " + procedureVO.fileName, "正确", Messages.getInformationIcon());
+        } catch (Exception ex) {
+            Messages.showErrorDialog("文件创建失败: " + ex.getLocalizedMessage(), "错误");
+        }
     }
 
 

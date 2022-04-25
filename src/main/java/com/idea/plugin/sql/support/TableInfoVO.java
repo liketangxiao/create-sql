@@ -7,8 +7,11 @@ import com.idea.plugin.sql.support.enums.PrimaryTypeEnum;
 import com.idea.plugin.sql.support.enums.ProcedureTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
 import com.idea.plugin.translator.TranslatorConfig;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +24,8 @@ public class TableInfoVO {
     public String comment;
     public String filePath;
     public String fileName;
+    public String modulePath;
+    public String date;
     public String jdbcUrl;
     public String username;
     public String password;
@@ -34,21 +39,34 @@ public class TableInfoVO {
     public List<FieldInfoVO> fieldInfos = new ArrayList<>();
 
     public static TableInfoVO builder() {
-        return new TableInfoVO();
+        TableInfoVO tableInfoVO = new TableInfoVO();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd.HH:mm:ss");
+        tableInfoVO.date = dateFormat.format(localDateTime);
+        return tableInfoVO;
     }
 
     public TableInfoVO procedureVO(ProcedureVO procedureVO) {
         this.author = procedureVO.author;
         this.fileName = procedureVO.fileName;
         this.filePath = procedureVO.filePath;
+        this.modulePath = procedureVO.modulePath;
         this.jdbcUrl = procedureVO.jdbcUrl;
         this.username = procedureVO.username;
         this.password = procedureVO.password;
         return this;
     }
 
-    public TableInfoVO procedureType(String procedureType) {
+    public TableInfoVO procedureType(String procedureType) throws SqlException {
         this.procedureType = Arrays.stream(procedureType.split(",")).map(code -> ProcedureTypeEnum.codeToEnum(code.trim())).filter(Objects::nonNull).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(this.procedureType)) {
+            throw new SqlException("生成文件类型不能为空");
+        }
+        return this;
+    }
+
+    public TableInfoVO modulePath(String modulePath) {
+        this.modulePath = modulePath.replaceAll("\\\\","/");
         return this;
     }
 
@@ -123,7 +141,7 @@ public class TableInfoVO {
 
     public TableInfoVO fieldInfos(String columnName, String columnType, String arg0, String arg1) throws SqlException {
         if (StringUtils.isEmpty(columnName) || StringUtils.isEmpty(columnType)) {
-            return this;
+            throw new SqlException("字段名称或者字段类型不能为空");
         }
         FieldInfoVO fieldInfoVO = FieldInfoVO.builder()
                 .columnName(columnName.toUpperCase())

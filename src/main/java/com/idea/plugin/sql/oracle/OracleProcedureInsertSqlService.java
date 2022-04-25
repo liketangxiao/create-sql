@@ -5,7 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.DataTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
-import com.idea.plugin.utils.DBProcedureUtils;
+import com.idea.plugin.utils.DBUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,9 +25,10 @@ public class OracleProcedureInsertSqlService extends BaseProcedureService {
         IProcedureService procedureService = new OracleProcedureInsertData();
         String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
         writeFile(path, String.format(procedureService.getComment(), comment));
-        Connection connection = DBProcedureUtils.getConnection(tableInfoVO);
+        Connection connection = DBUtils.getConnection(tableInfoVO);
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(tableInfoVO.insertSql);
+            preparedStatement = connection.prepareStatement(tableInfoVO.insertSql);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<String> codeList = new ArrayList<>();
             ResultSetMetaData metaData = resultSet.getMetaData();
@@ -37,13 +38,13 @@ public class OracleProcedureInsertSqlService extends BaseProcedureService {
             }
             String codes = String.join(", ", codeList);
             while (resultSet.next()) {
-                List<String> rowValues=new ArrayList<>();
+                List<String> rowValues = new ArrayList<>();
                 List<String> declareColumns = new ArrayList<>();
                 List<String> dbmsLobCreates = new ArrayList<>();
                 List<String> dbmsLobApends = new ArrayList<>();
-                String idValue = DBProcedureUtils.getIdValue(resultSet.getString(1));
+                String idValue = DBUtils.getIdValue(resultSet.getString(1));
                 rowValues.add(idValue);
-                DBProcedureUtils.getRowValues(rowValues, DataTypeEnum.ORACLE, resultSet, metaData, declareColumns, dbmsLobCreates, dbmsLobApends);
+                DBUtils.getRowValues(rowValues, DataTypeEnum.ORACLE, resultSet, metaData, declareColumns, dbmsLobCreates, dbmsLobApends);
                 String values = String.join(", ", rowValues);
                 if (CollectionUtils.isNotEmpty(declareColumns)) {
                     String declareColumn = String.join("", declareColumns);
@@ -56,6 +57,8 @@ public class OracleProcedureInsertSqlService extends BaseProcedureService {
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            DBUtils.close(connection, preparedStatement);
         }
     }
 }

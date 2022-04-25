@@ -1,7 +1,10 @@
 package com.idea.plugin.utils;
 
+import com.idea.plugin.sql.support.FieldInfoVO;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.DataTypeEnum;
+import com.idea.plugin.sql.support.enums.FieldTypeEnum;
+import com.idea.plugin.sql.support.enums.PrimaryTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-public class DBProcedureUtils {
+public class DBUtils {
 
     public static void getRowValues(List<String> valueList, DataTypeEnum dataTypeEnum, ResultSet resultSet, ResultSetMetaData metaData, List<String> declareColumns, List<String> dbmsLobCreates, List<String> dbmsLobApends) throws SQLException {
         for (int i = 2; i <= metaData.getColumnCount(); i++) {
@@ -25,7 +28,10 @@ public class DBProcedureUtils {
             if (value != null && value != "null") {
                 if (String.class.getName().equals(columnClassName)) {
                     value = "'" + value + "'";
-                } else if (Timestamp.class.getName().equals(columnClassName) || LocalDate.class.getName().equals(columnClassName) || LocalDateTime.class.getName().equals(columnClassName) || Date.class.getName().equals(columnClassName)) {
+                } else if (Timestamp.class.getName().equals(columnClassName)
+                        || LocalDate.class.getName().equals(columnClassName)
+                        || LocalDateTime.class.getName().equals(columnClassName)
+                        || Date.class.getName().equals(columnClassName)) {
                     Timestamp timestamp = resultSet.getTimestamp(i);
                     if (timestamp != null) {
                         if ("CREATE_DATE".equals(columnLabel) || "UPDATE_DATE".equals(columnLabel)) {
@@ -77,6 +83,13 @@ public class DBProcedureUtils {
         }
     }
 
+    public static String getIdValue(String value) {
+        if (StringUtils.isEmpty(value) || "UUID".equalsIgnoreCase(value)) {
+            value = UUID.randomUUID().toString().replace("-", "");
+        }
+        return "'" + value + "'";
+    }
+
     public static Connection getConnection(TableInfoVO tableInfoVO) {
         try {
             AssertUtils.assertIsTrue(StringUtils.isNotEmpty(tableInfoVO.username), "username不能为空");
@@ -100,10 +113,95 @@ public class DBProcedureUtils {
         }
     }
 
-    public static String getIdValue(String value) {
-        if (StringUtils.isEmpty(value) || "UUID".equalsIgnoreCase(value)) {
-            value = UUID.randomUUID().toString().replace("-", "");
-        }
-        return "'" + value + "'";
+
+    public static void getTableInfoVOFromDB(TableInfoVO tableInfoVO) {
+        getTableInfo(tableInfoVO);
     }
+
+    private static void getTableInfo(TableInfoVO tableInfoVO) {
+        Connection connection = getConnection(tableInfoVO);
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet tables = metaData.getTables(null, "", tableInfoVO.tableName, new String[]{"TABLE"});
+            if (tables.next()) {
+                String remarks = tables.getString("REMARKS");
+                if (StringUtils.isNotEmpty(remarks)) {
+                    tableInfoVO.tableComment = remarks;
+                }
+            } else {
+                throw new RuntimeException(String.format("数据库不存在表：%s", tableInfoVO.tableName));
+            }
+            ResultSet primaryKeys = metaData.getPrimaryKeys(null, null, tableInfoVO.tableName);
+            String primaryKey = null;
+            while (primaryKeys.next()) {
+                primaryKey = primaryKeys.getString("COLUMN_NAME");
+            }
+            ResultSet columns = metaData.getColumns(null, null, tableInfoVO.tableName, null);
+            while (columns.next()) {
+                String columnName = columns.getString("COLUMN_NAME");
+                String remarks = columns.getString("REMARKS");
+                FieldInfoVO fieldInfoVO = FieldInfoVO.builder()
+                        .columnName(columnName)
+                        .columnType(FieldTypeEnum.getFieldTypeBySqlType(columns.getInt("DATA_TYPE")));
+                if (StringUtils.isNotEmpty(remarks)) {
+                    fieldInfoVO.comment = remarks;
+                }
+                if (columnName.equals(primaryKey)) {
+                    fieldInfoVO.primary = PrimaryTypeEnum.PRIMARY;
+                }
+                tableInfoVO.fieldInfos.add(fieldInfoVO);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            close(connection);
+        }
+    }
+
+    private static void getFieldInfo(TableInfoVO tableInfoVO) {
+        Connection connection = getConnection(tableInfoVO);
+        String sql = "SELECT * FROM";
+        PreparedStatement preparedStatement = null;
+        String tableSql = sql + tableInfoVO.tableName;
+        try {
+            preparedStatement = connection.prepareStatement(tableSql);
+            ResultSetMetaData metaData = preparedStatement.getMetaData();
+            int size = metaData.getColumnCount();
+            for (int i = 0; i < size; i++) {
+                FieldInfoVO fieldInfoVO = FieldInfoVO.builder()
+                        .columnName(metaData.getColumnLabel(i).toUpperCase())
+                        .columnType(FieldTypeEnum.getFieldTypeBySqlType(metaData.getColumnType(i)));
+                tableInfoVO.fieldInfos.add(fieldInfoVO);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            close(connection, preparedStatement);
+            close(preparedStatement);
+        }
+    }
+
+    public static void close(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    public static void close(PreparedStatement preparedStatement) {
+        if (preparedStatement != null) {
+            try {
+                preparedStatement.close();
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    public static void close(Connection connection, PreparedStatement preparedStatement) {
+        close(connection);
+        close(preparedStatement);
+    }
+
 }

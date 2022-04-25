@@ -3,7 +3,7 @@ package com.idea.plugin.sql.support.enums;
 import java.util.Comparator;
 import java.util.List;
 
-public enum FileTypeEnum {
+public enum FileDDLTypeEnum {
     CREATE("create", 1),
     ALTER("alter", 2),
     INSERT("insert", 3),
@@ -13,7 +13,7 @@ public enum FileTypeEnum {
     private String code;
     private Integer positon;
 
-    FileTypeEnum(String code, Integer positon) {
+    FileDDLTypeEnum(String code, Integer positon) {
         this.code = code;
         this.positon = positon;
     }
@@ -26,7 +26,7 @@ public enum FileTypeEnum {
         return positon;
     }
 
-    public static FileTypeEnum getFirstFileType(List<FileTypeEnum> fileTypeEnumList) {
-        return fileTypeEnumList.stream().min(Comparator.comparing(FileTypeEnum::getPositon)).orElse(INITIAL);
+    public static FileDDLTypeEnum getFirstFileType(List<FileDDLTypeEnum> fileDDLTypeEnumList) {
+        return fileDDLTypeEnumList.stream().min(Comparator.comparing(FileDDLTypeEnum::getPositon)).orElse(INITIAL);
     }
 }
