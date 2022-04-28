@@ -48,6 +48,8 @@
 
         <projectConfigurable id="Create.File" groupId="tools" displayName="Create File"
                              instance="com.idea.plugin.window.SettingFactory"/>
+<!--        <toolWindow id="Create" anchor="right" secondary="false" icon="/img/sql.svg"-->
+<!--                             factoryClass="com.idea.plugin.window.CreateCacheFactory"/>-->
     </extensions>
 
     <actions>

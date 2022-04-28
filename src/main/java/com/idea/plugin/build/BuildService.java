@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
+import java.io.File;
 
 public class BuildService {
 
@@ -20,12 +21,6 @@ public class BuildService {
         FileTypeEnum fileTypeEnum = FileTypeEnum.codeToEnum(fileType);
         if (fileTypeEnum != null) {
             try {
-                String targetPath = filePath.replaceAll(fileTypeEnum.getPath(), "target/classes/");
-                String filePathStr = targetPath.substring(targetPath.lastIndexOf("target/classes/") + 15);
-                if (FileTypeEnum.JAVA.equals(fileTypeEnum)) {
-                    targetPath = targetPath.replaceAll(".java", ".class");
-                    fileName = fileName.replaceAll(".java", ".class");
-                }
                 String absolutePath = config.getBuildConfigVO().filePathCache;
                 if (StringUtils.isEmpty(absolutePath)) {
                     JFileChooser chooser = new JFileChooser();
@@ -37,10 +32,34 @@ public class BuildService {
                     absolutePath = chooser.getSelectedFile().getAbsolutePath();
                     config.getBuildConfigVO().filePathCache = absolutePath;
                 }
+                String targetPath = filePath.replaceAll(fileTypeEnum.getPath(), "target/classes/");
+                String filePathStr = targetPath.substring(targetPath.lastIndexOf("target/classes/") + 15);
+                if (FileTypeEnum.JAVA.equals(fileTypeEnum)) {
+                    targetPath = targetPath.replaceAll(".java", ".class");
+                    fileName = fileName.replaceAll(".java", ".class");
+                    int subClassNum = 1;
+                    boolean hasSubClass = true;
+                    while (hasSubClass) {
+                        int i = targetPath.lastIndexOf(".");
+                        String subTargetPath = targetPath.substring(0, i) + "$" + subClassNum + targetPath.substring(i);
+                        int j = fileName.lastIndexOf(".");
+                        String subFileName = fileName.substring(0, j) + "$" + subClassNum + fileName.substring(j);
+                        File newfile = new File(subTargetPath);
+                        if (newfile.exists()) {
+                            ++subClassNum;
+                            String path = absolutePath + "/" + subFileName;
+                            FileUtils.copyFile(targetPath, path);
+                        } else {
+                            hasSubClass = false;
+                        }
+                    }
+                }
                 String path = absolutePath + "/" + fileName;
-                String pathtxt = absolutePath + "/增量地址.txt";
                 FileUtils.copyFile(targetPath, path);
-                FileUtils.writeFileAdd(pathtxt, filePathStr + "\n");
+                String pathtxt = absolutePath + "/增量地址.txt";
+                if (!FileUtils.readFile(pathtxt).contains(filePathStr)) {
+                    FileUtils.writeFileAdd(pathtxt, filePathStr + "\n");
+                }
                 Messages.showMessageDialog("增量文件导入成功, 路径: " + path, "正确", Messages.getInformationIcon());
             } catch (Exception ex) {
                 Messages.showErrorDialog("增量文件导入失败: " + ex.getLocalizedMessage(), "错误");
