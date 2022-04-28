@@ -28,7 +28,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,7 +63,7 @@ public class CreateDemoFileUI {
     private String selectFilePath;
 
     public CreateDemoFileUI() {
-        config = DemoSettings.getInstance(null != project ? project : ProjectManager.getInstance().getDefaultProject());
+        config = DemoSettings.getInstance(ProjectManager.getInstance().getDefaultProject());
         this.author.setText(config.getDemoConfigVO().author);
         this.jdbcUrl.setText(config.getDemoConfigVO().jdbcUrl);
         this.username.setText(config.getDemoConfigVO().username);
@@ -261,10 +260,6 @@ public class CreateDemoFileUI {
         });
     }
 
-    public void removeCache() {
-        config.getDemoConfigVO().tabNameCacheMap = new ConcurrentHashMap<>();
-        config.getDemoConfigVO().tableInfoCacheMap = new ConcurrentHashMap<>();
-    }
 
     private static class ChooseStringDialog extends ChooseElementsDialog<String> {
         public ChooseStringDialog(Project project, List<String> names, String title, String description) {

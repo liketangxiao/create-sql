@@ -41,7 +41,6 @@ public class DemoGenerateDialogWrapper extends DialogWrapper {
     public void doCancelAction() {
         super.doCancelAction();
         fillData(project, selectFilePath);
-        createDemoFileUI.removeCache();
     }
 
 

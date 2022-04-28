@@ -1,17 +1,19 @@
 <idea-plugin>
     <!-- 插件唯一标识，用于在插件市场中唯一确定身份的标识，在不同版本中，必须保持一致，建议设置值为：包名 + 插件名称 -->
-    <id>com.demo.plugin.create-sql</id>
+    <id>com.demo.plugin.CreateFile</id>
     <!-- 插件的名称，显示在IDEA已安装插件列表中 -->
-    <name>create-sql</name>
+    <name>CreateFile</name>
     <!--  -->
     <vendor email=""></vendor>
     <!-- 插件的描述 -->
     <description>
         <![CDATA[
         <h2>创建可重复执行SQL脚本</h2>
-        <a href="https://github.com/wangyujie2333/create-sql">create-sql source code and document</a><br>
+        <a href="https://github.com/wangyujie2333/create-sql">Create File source code and document</a><br>
         ]]>
     </description>
+
+
     <change-notes><![CDATA[
       <h4>v1.03 update</h4>
       <ul>
@@ -38,13 +40,14 @@
     ]]>
     </change-notes>
 
-    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
-         on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.idea.plugin.demo.DemoSettings"/>
-        <!-- 配置 File -> Settings -> Tools -->
+        <projectService serviceImplementation="com.idea.plugin.build.BuildSettings"/>
+
+        <projectConfigurable id="Create.File" groupId="tools" displayName="Create File"
+                             instance="com.idea.plugin.window.SettingFactory"/>
     </extensions>
 
     <actions>
@@ -64,5 +67,10 @@
                     text="JavaFile" description="Create Java File" icon="/img/java.svg">
             </action>
         </group>
+        <action id="Copy Build File" class="com.idea.plugin.popup.CopyBuildFileAction" text="Copy Build File"
+                description="Copy Build File">
+            <add-to-group group-id="CopyReferencePopupGroup" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C"/>
+        </action>
     </actions>
 </idea-plugin>

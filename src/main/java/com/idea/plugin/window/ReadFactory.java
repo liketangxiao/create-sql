@@ -8,6 +8,12 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 配置侧边窗体
+ *
+ * @author wangyuj
+ * @date 2022/04/28
+ */
 public class ReadFactory implements ToolWindowFactory {
 
     private ReadingUI readingUI = new ReadingUI();
