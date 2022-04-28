@@ -3,6 +3,8 @@ package com.idea.plugin.sql.support;
 import com.idea.plugin.sql.support.enums.FieldTypeEnum;
 import com.idea.plugin.sql.support.enums.NullTypeEnum;
 import com.idea.plugin.sql.support.enums.PrimaryTypeEnum;
+import com.idea.plugin.translator.TranslatorConfig;
+import org.apache.commons.lang3.StringUtils;
 
 public class FieldInfoVO {
     public String columnName;
@@ -19,6 +21,9 @@ public class FieldInfoVO {
 
     public FieldInfoVO columnName(String columnName) {
         this.columnName = columnName;
+        if (StringUtils.isEmpty(comment)) {
+            this.comment = TranslatorConfig.translate(columnName);
+        }
         return this;
     }
 

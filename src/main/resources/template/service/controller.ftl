@@ -15,7 +15,7 @@ import ${import};
 public class ${simpleName} {
 
     @Autowired
-    ${serviceName} ${serviceName?uncap_first};
+    ${iserviceName} ${serviceName?uncap_first};
 
     /**
     * 新增${comment}
@@ -51,7 +51,7 @@ public class ${simpleName} {
     * 通过ID查询单个${comment}
     *
     * @param ${idName} ID
-    * @return {@link ${entityName}}
+    * @return {@link ${voName}}
     */
     @RequestMapping(method = RequestMethod.POST, value = "/findBy${idName?cap_first}")
     public Object findBy${idName?cap_first}(${idClass} ${idName}) {

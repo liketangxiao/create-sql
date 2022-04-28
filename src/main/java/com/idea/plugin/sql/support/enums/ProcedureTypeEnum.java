@@ -1,5 +1,7 @@
 package com.idea.plugin.sql.support.enums;
 
+import com.idea.plugin.orm.support.enums.FileCreateTypeEnum;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,10 +30,13 @@ public enum ProcedureTypeEnum {
             "password",
             "tableName",
             "insertSql")),
-    ORM_GENERATE(null, Arrays.asList(
-            "modulePath")),
+    DO(FileCreateTypeEnum.DO, Arrays.asList("modulePath")),
+    DAO(FileCreateTypeEnum.DAO, Arrays.asList("modulePath")),
+    SERVICE(FileCreateTypeEnum.SERVICE, Arrays.asList("modulePath")),
+    CONTROLLER(FileCreateTypeEnum.CONTROLLER, Arrays.asList("modulePath")),
     ;
     private FileDDLTypeEnum fileType;
+    private FileCreateTypeEnum fileCreateType;
     private List<String> mustFieldList;
 
     ProcedureTypeEnum(FileDDLTypeEnum fileType, List<String> mustFieldList) {
@@ -39,8 +44,17 @@ public enum ProcedureTypeEnum {
         this.mustFieldList = mustFieldList;
     }
 
+    ProcedureTypeEnum(FileCreateTypeEnum fileCreateType, List<String> mustFieldList) {
+        this.fileCreateType = fileCreateType;
+        this.mustFieldList = mustFieldList;
+    }
+
     public FileDDLTypeEnum getFileType() {
         return fileType;
+    }
+
+    public FileCreateTypeEnum getFileCreateType() {
+        return fileCreateType;
     }
 
     public List<String> getMustFieldList() {

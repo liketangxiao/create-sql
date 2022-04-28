@@ -4,6 +4,7 @@ import com.idea.plugin.sql.BaseProcedureService;
 import com.idea.plugin.sql.IProcedureService;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.idea.plugin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class OracleProcedureInsertDataService extends BaseProcedureService {
         }
         IProcedureService procedureService = new OracleProcedureInsertData();
         String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
-        writeFile(path, String.format(procedureService.getComment(), comment));
+        FileUtils.writeFile(path, String.format(procedureService.getComment(), comment));
         Pattern pattern = Pattern.compile("^'\\d{4}-\\d{2}-\\d{2}");
         for (String insertSql : tableInfoVO.insertData.split("\n")) {
             int s1 = insertSql.indexOf("(");
@@ -46,7 +47,7 @@ public class OracleProcedureInsertDataService extends BaseProcedureService {
                 }
             }
             values = String.join(", ", valueList);
-            writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
+            FileUtils.writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
         }
     }
 }

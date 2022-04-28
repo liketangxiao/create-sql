@@ -4,6 +4,7 @@ import com.idea.plugin.sql.BaseProcedureService;
 import com.idea.plugin.sql.IProcedureService;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.idea.plugin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -17,7 +18,7 @@ public class MysqlProcedureAddDataService extends BaseProcedureService {
         }
         IProcedureService procedureService = new MysqlProcedureAddData();
         String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
-        writeFile(path, String.format(procedureService.getComment(), comment));
+        FileUtils.writeFile(path, String.format(procedureService.getComment(), comment));
         String[] columnNameArr = tableInfoVO.insertColumnName.split(",");
         String columnNameDeclare = Arrays.stream(columnNameArr)
                 .map(columnName -> "    DECLARE V_" + columnName.trim() + " TINYTEXT;").collect(Collectors.joining("\n"));
@@ -37,8 +38,8 @@ public class MysqlProcedureAddDataService extends BaseProcedureService {
                 tableInfoVO.tableName, tableInfoVO.tableName, columnParams, columnNameDeclare,
                 tableInfoVO.tableName, columnCondition, tableInfoVO.tableName, columnCondition,
                 columnNameInto, tableInfoVO.tableName, tableInfoVO.insertColumnName, columnNameValue);
-        writeFile(path, procedure);
-        writeFile(path, String.format(procedureService.getCall(), tableInfoVO.tableName));
-        writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
+        FileUtils.writeFile(path, procedure);
+        FileUtils.writeFile(path, String.format(procedureService.getCall(), tableInfoVO.tableName));
+        FileUtils.writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
     }
 }

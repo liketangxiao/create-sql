@@ -6,6 +6,7 @@ import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.DataTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
 import com.idea.plugin.utils.DBUtils;
+import com.idea.plugin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
@@ -23,10 +24,11 @@ public class MysqlProcedureInsertSqlService extends BaseProcedureService {
         }
         IProcedureService procedureService = new MysqlProcedureInsertData();
         String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
-        writeFile(path, String.format(procedureService.getComment(), comment));
-        Connection connection = DBUtils.getConnection(tableInfoVO);
+        FileUtils.writeFile(path, String.format(procedureService.getComment(), comment));
+        Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
+            connection = DBUtils.getConnection(tableInfoVO);
             preparedStatement = connection.prepareStatement(tableInfoVO.insertSql);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<String> codeList = new ArrayList<>();
@@ -42,7 +44,7 @@ public class MysqlProcedureInsertSqlService extends BaseProcedureService {
                 rowValues.add(idValue);
                 DBUtils.getRowValues(rowValues, DataTypeEnum.MYSQL, resultSet, metaData, null, null, null);
                 String values = String.join(", ", rowValues);
-                writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
+                FileUtils.writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, codes, values, tableInfoVO.tableName, idCode, idValue));
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);

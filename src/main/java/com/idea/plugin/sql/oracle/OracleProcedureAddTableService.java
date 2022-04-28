@@ -4,6 +4,7 @@ import com.idea.plugin.sql.BaseProcedureService;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.PrimaryTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.idea.plugin.utils.FileUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,7 +19,7 @@ public class OracleProcedureAddTableService extends BaseProcedureService {
         }
         OracleProcedureAddTable procedureService = new OracleProcedureAddTable();
         String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增表" : tableInfoVO.comment;
-        writeFile(path, String.format(procedureService.getComment(), comment));
+        FileUtils.writeFile(path, String.format(procedureService.getComment(), comment));
         String procedure = procedureService.getProcedure();
         Integer length = tableInfoVO.fieldInfos.stream().map(fieldInfo -> fieldInfo.columnName.length()).max(Comparator.comparing(Integer::intValue)).get();
         String call = tableInfoVO.fieldInfos.stream().map(fieldVO -> {
@@ -30,7 +31,7 @@ public class OracleProcedureAddTableService extends BaseProcedureService {
         }).collect(Collectors.joining(",\n"));
         String callComment = tableInfoVO.fieldInfos.stream().map(fieldVO -> String.format(procedureService.getCallComment(), fieldVO.columnName, fieldVO.comment)).collect(Collectors.joining("\n"));
         procedure = String.format(procedure, tableInfoVO.tableName, tableInfoVO.tableName, call, tableInfoVO.tableName, tableInfoVO.tableComment, callComment);
-        writeFile(path, procedure);
+        FileUtils.writeFile(path, procedure);
     }
 
     private String getColumnName(String columnName, Integer length) {

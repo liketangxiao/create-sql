@@ -70,6 +70,13 @@ public enum FieldTypeEnum {
         return String.format(mtype, args);
     }
 
+    public String getType(String arg) {
+        if (VARCHAR.name().equals(this.name()) || NUMBER.name().equals(this.name())) {
+            return this.name() + "(" + arg + ")";
+        }
+        return this.name();
+    }
+
     public String getOtype(Object... args) {
         return String.format(otype, args);
     }
@@ -85,6 +92,11 @@ public enum FieldTypeEnum {
     public static FieldTypeEnum getFieldTypeBySqlType(int sqlType) {
         return Arrays.stream(FieldTypeEnum.values())
                 .filter(fieldTypeEnum -> fieldTypeEnum.jtype.equals(JDBCType.valueOf(sqlType))).findAny().orElse(null);
+    }
+
+    public static FieldTypeEnum getFieldTypeByOType(String oType) {
+        return Arrays.stream(FieldTypeEnum.values())
+                .filter(fieldTypeEnum -> fieldTypeEnum.otype.startsWith(oType)).findAny().orElse(null);
     }
 
 }

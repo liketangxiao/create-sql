@@ -4,6 +4,7 @@ import com.idea.plugin.sql.BaseProcedureService;
 import com.idea.plugin.sql.IProcedureService;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.idea.plugin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -17,7 +18,7 @@ public class OracleProcedureAddDataService extends BaseProcedureService {
         }
         IProcedureService procedureService = new OracleProcedureAddData();
         String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增字段" : tableInfoVO.comment;
-        writeFile(path, String.format(procedureService.getComment(), comment));
+        FileUtils.writeFile(path, String.format(procedureService.getComment(), comment));
         String[] columnNameArr = tableInfoVO.insertColumnName.split(",");
         String columnNameValue = Arrays.stream(Arrays.copyOfRange(columnNameArr, 1, columnNameArr.length))
                 .map(columnName -> "V_TABLE_DATA." + columnName.trim()).collect(Collectors.joining(", "));
@@ -33,8 +34,8 @@ public class OracleProcedureAddDataService extends BaseProcedureService {
                 tableInfoVO.tableName, columnParams, tableInfoVO.tableName + "%ROWTYPE",
                 tableInfoVO.tableName, columnCondition, tableInfoVO.tableName, columnCondition,
                 tableInfoVO.tableName, tableInfoVO.insertColumnName, columnNameValue, tableInfoVO.tableName);
-        writeFile(path, procedure);
-        writeFile(path, String.format(procedureService.getCall(), tableInfoVO.tableName));
-        writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
+        FileUtils.writeFile(path, procedure);
+        FileUtils.writeFile(path, String.format(procedureService.getCall(), tableInfoVO.tableName));
+        FileUtils.writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
     }
 }

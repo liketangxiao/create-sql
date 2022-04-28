@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 public class TableInfoVO {
     public String author;
+    public String dataType;
+    public String schema;
     public List<ProcedureTypeEnum> procedureType = new ArrayList<>();
     public String comment;
     public String filePath;
@@ -66,7 +68,7 @@ public class TableInfoVO {
     }
 
     public TableInfoVO modulePath(String modulePath) {
-        this.modulePath = modulePath.replaceAll("\\\\","/");
+        this.modulePath = modulePath.replaceAll("\\\\", "/");
         return this;
     }
 

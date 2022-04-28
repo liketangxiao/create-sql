@@ -8,6 +8,7 @@ import com.idea.plugin.orm.support.enums.FileTypeEnum;
 import com.idea.plugin.orm.support.enums.FileTypePathEnum;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.idea.plugin.utils.FileUtils;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -25,7 +26,7 @@ public class ProjectGenerator extends GeneratorConfig {
         try {
             getFileTypeInfo(context);
             TableModuleFactory.createTableModule(context);
-            writeFile(context.getFileTypeInfo().getAbsulotePath(), getTemplate(context));
+            FileUtils.writeFile(context.getFileTypeInfo().getAbsulotePath(), getTemplate(context));
         } catch (Exception e) {
             throw new RuntimeException(e.getLocalizedMessage());
         }

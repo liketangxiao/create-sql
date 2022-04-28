@@ -24,7 +24,7 @@ public class ProcedureVO {
     }
 
     public ProcedureVO filePath(String filePath) {
-        this.filePath = filePath.replaceAll("\\\\","/");
+        this.filePath = filePath.replaceAll("\\\\", "/");
         return this;
     }
 
@@ -34,7 +34,7 @@ public class ProcedureVO {
     }
 
     public ProcedureVO modulePath(String modulePath) {
-        this.modulePath = modulePath.replaceAll("\\\\","/");
+        this.modulePath = modulePath.replaceAll("\\\\", "/");
         return this;
     }
 

@@ -13,15 +13,20 @@
         ]]>
     </description>
     <change-notes><![CDATA[
-      <h3>v1.02 update</h3>
+      <h4>v1.03 update</h4>
+      <ul>
+          <li>支持下载模板文件demo.txt</li>
+          <li>支持根据表生成代码文件</li>
+      </ul>
+      <h4>v1.02 update</h4>
       <ul>
           <li>支持表名和列表根据定义编码自动翻译成注释</li>
       </ul>
-      <h3>v1.01 update</h3>
+      <h4>v1.01 update</h4>
       <ul>
           <li>优化支持数据库查询数据生成可重复执行sql语句</li>
       </ul>
-      <h3>v1.01 update</h3>
+      <h4>v1.01 update</h4>
       <ul>
           <li>支持生成以下生成脚本</li>
           <li>ADD_TABLE(创建表)</li>
@@ -38,29 +43,25 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.idea.plugin.demo.DemoSettings"/>
         <!-- 配置 File -> Settings -> Tools -->
-        <!--        <projectConfigurable groupId="tools" displayName="My Test Config" id="setting.id"-->
-        <!--                             instance="com.idea.plugin.window.SettingFactory"/>-->
-        <!-- 窗体 (IDEA 界面右侧) -->
-        <!--        <toolWindow id="Read-Book" secondary="false" anchor="right"-->
-        <!--                    factoryClass="com.idea.plugin.window.ReadFactory"/>-->
     </extensions>
 
     <actions>
         <action id="EditorCreateSqlFile" class="com.idea.plugin.popup.SqlFilePopupAction"
-                text="FsscSqlFile" description="CreateSqlFile" icon="/img/logo.svg">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
+                text="SqlFile" description="CreateSqlFile" icon="/img/sql.svg">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <group id="Project.View.CreateFile.Group.Main" text="CreateFile"
                description="Group of Create File"
                popup="true"
                icon="/img/file_view.svg">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-            <action id="CreateSqlFile" class="com.idea.plugin.popup.SqlFilePopupAction"
-                    text="SqlFile" description="Create Sql File" icon="/img/sql.svg">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <action id="CreateDemoFile" class="com.idea.plugin.popup.DemoFilePopupAction"
+                    text="DemoFile" description="Create Demo File" icon="/img/txt.svg">
             </action>
             <action id="CreateJavaFile" class="com.idea.plugin.popup.JavaFilePopupAction"
-                    text="JavaFile" description="Create Orm File" icon="/img/java.svg">
+                    text="JavaFile" description="Create Java File" icon="/img/java.svg">
             </action>
         </group>
     </actions>

@@ -1,11 +1,15 @@
 package com.idea.plugin.utils;
 
+import com.idea.plugin.demo.DemoConfigVO;
 import com.idea.plugin.sql.support.FieldInfoVO;
+import com.idea.plugin.sql.support.IndexInfoVO;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.DataTypeEnum;
 import com.idea.plugin.sql.support.enums.FieldTypeEnum;
+import com.idea.plugin.sql.support.enums.NullTypeEnum;
 import com.idea.plugin.sql.support.enums.PrimaryTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -14,9 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 public class DBUtils {
 
@@ -90,6 +92,15 @@ public class DBUtils {
         return "'" + value + "'";
     }
 
+    public static Connection getConnection(String jdbcUrl, String username, String password) {
+        TableInfoVO tableInfoVO = new TableInfoVO();
+        tableInfoVO.jdbcUrl = jdbcUrl;
+        tableInfoVO.username = username;
+        tableInfoVO.password = password;
+        return getConnection(tableInfoVO);
+    }
+
+
     public static Connection getConnection(TableInfoVO tableInfoVO) {
         try {
             AssertUtils.assertIsTrue(StringUtils.isNotEmpty(tableInfoVO.username), "username不能为空");
@@ -102,14 +113,36 @@ public class DBUtils {
             properties.put("useInformationSchema", "true");
             if (tableInfoVO.jdbcUrl.contains(DataTypeEnum.MYSQL.getCode())) {
                 Class.forName("com.mysql.jdbc.Driver");
-                return DriverManager.getConnection(tableInfoVO.jdbcUrl + "?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false", properties);
+                int i = tableInfoVO.jdbcUrl.lastIndexOf("/");
+                Connection connection = DriverManager.getConnection(tableInfoVO.jdbcUrl + "?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false", properties);
+                tableInfoVO.schema = connection.getSchema();
+                tableInfoVO.dataType = DataTypeEnum.MYSQL.getCode();
+                return connection;
             } else if (tableInfoVO.jdbcUrl.contains(DataTypeEnum.ORACLE.getCode())) {
                 Class.forName("oracle.jdbc.driver.OracleDriver");
+                tableInfoVO.schema = tableInfoVO.username.toUpperCase();
+                tableInfoVO.dataType = DataTypeEnum.ORACLE.getCode();
                 return DriverManager.getConnection(tableInfoVO.jdbcUrl, properties);
             }
-            throw new SqlException("数据库配置错误");
+            throw new SqlException("数据库配置错误" + tableInfoVO.jdbcUrl);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public static List<String> getAllTableName(Connection connection, String schema) {
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet rs = metaData.getTables(schema, schema, "%", new String[]{"TABLE"});
+            List<String> ls = new ArrayList<>();
+            while (rs.next()) {
+                ls.add(rs.getString("TABLE_NAME"));
+            }
+            return ls;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            close(connection);
         }
     }
 
@@ -118,11 +151,12 @@ public class DBUtils {
         getTableInfo(tableInfoVO);
     }
 
-    private static void getTableInfo(TableInfoVO tableInfoVO) {
-        Connection connection = getConnection(tableInfoVO);
+    public static void getTableInfo(TableInfoVO tableInfoVO) {
+        Connection connection = null;
         try {
+            connection = getConnection(tableInfoVO);
             DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet tables = metaData.getTables(null, "", tableInfoVO.tableName, new String[]{"TABLE"});
+            ResultSet tables = metaData.getTables(tableInfoVO.schema, tableInfoVO.schema, tableInfoVO.tableName, new String[]{"TABLE"});
             if (tables.next()) {
                 String remarks = tables.getString("REMARKS");
                 if (StringUtils.isNotEmpty(remarks)) {
@@ -131,23 +165,59 @@ public class DBUtils {
             } else {
                 throw new RuntimeException(String.format("数据库不存在表：%s", tableInfoVO.tableName));
             }
-            ResultSet primaryKeys = metaData.getPrimaryKeys(null, null, tableInfoVO.tableName);
-            String primaryKey = null;
+            ResultSet primaryKeys = metaData.getPrimaryKeys(tableInfoVO.schema, tableInfoVO.schema, tableInfoVO.tableName);
+            String primaryKey = "";
             while (primaryKeys.next()) {
                 primaryKey = primaryKeys.getString("COLUMN_NAME");
             }
-            ResultSet columns = metaData.getColumns(null, null, tableInfoVO.tableName, null);
-            while (columns.next()) {
+            ResultSet idxRs = metaData.getIndexInfo(tableInfoVO.schema, tableInfoVO.schema, tableInfoVO.tableName, false, false);
+            while (idxRs.next()) {
+                String indexName = idxRs.getString("INDEX_NAME");
+                String columnName = idxRs.getString("COLUMN_NAME");
+                if (StringUtils.isEmpty(columnName) || primaryKey.equals(columnName)) {
+                    continue;
+                }
+                tableInfoVO.indexInfos.add(IndexInfoVO.builder().indexColumnName(columnName).indexName(indexName));
+            }
+            ResultSet columns = metaData.getColumns(tableInfoVO.schema, tableInfoVO.schema, tableInfoVO.tableName, null);
+            int maxCount = 0;
+            while (columns.next() && maxCount < 20) {
+                maxCount++;
                 String columnName = columns.getString("COLUMN_NAME");
                 String remarks = columns.getString("REMARKS");
+                String isNullable = columns.getString("IS_NULLABLE");
+                String columnSize = columns.getString("COLUMN_SIZE");
+                FieldTypeEnum dataType = null;
+                if (tableInfoVO.jdbcUrl.contains(DataTypeEnum.MYSQL.getCode())) {
+                    dataType = FieldTypeEnum.getFieldTypeBySqlType(columns.getInt("DATA_TYPE"));
+                } else if (tableInfoVO.jdbcUrl.contains(DataTypeEnum.ORACLE.getCode())) {
+                    String typeName = columns.getString("TYPE_NAME");
+                    if (typeName.contains("(")) {
+                        typeName = typeName.replaceAll("\\(.*\\)", "");
+                    }
+                    dataType = FieldTypeEnum.getFieldTypeByOType(typeName);
+                }
+                if (dataType == null) {
+                    dataType = FieldTypeEnum.VARCHAR;
+                }
+                int digits = columns.getInt("DECIMAL_DIGITS");
                 FieldInfoVO fieldInfoVO = FieldInfoVO.builder()
                         .columnName(columnName)
-                        .columnType(FieldTypeEnum.getFieldTypeBySqlType(columns.getInt("DATA_TYPE")));
+                        .columnType(dataType);
                 if (StringUtils.isNotEmpty(remarks)) {
                     fieldInfoVO.comment = remarks;
                 }
                 if (columnName.equals(primaryKey)) {
                     fieldInfoVO.primary = PrimaryTypeEnum.PRIMARY;
+                }
+                if (!isNullable.equals("YES")) {
+                    fieldInfoVO.nullType = NullTypeEnum.NOT_NULL;
+                }
+                if (FieldTypeEnum.VARCHAR.equals(fieldInfoVO.columnType)) {
+                    fieldInfoVO.columnTypeArgs = columnSize;
+                }
+                if (FieldTypeEnum.NUMBER.equals(fieldInfoVO.columnType)) {
+                    fieldInfoVO.columnTypeArgs = columnSize + "," + digits;
                 }
                 tableInfoVO.fieldInfos.add(fieldInfoVO);
             }
@@ -158,26 +228,81 @@ public class DBUtils {
         }
     }
 
-    private static void getFieldInfo(TableInfoVO tableInfoVO) {
-        Connection connection = getConnection(tableInfoVO);
-        String sql = "SELECT * FROM";
+    public static void getTableDataInfo(TableInfoVO tableInfoVO) {
+        Connection connection = null;
         PreparedStatement preparedStatement = null;
-        String tableSql = sql + tableInfoVO.tableName;
         try {
-            preparedStatement = connection.prepareStatement(tableSql);
-            ResultSetMetaData metaData = preparedStatement.getMetaData();
-            int size = metaData.getColumnCount();
-            for (int i = 0; i < size; i++) {
-                FieldInfoVO fieldInfoVO = FieldInfoVO.builder()
-                        .columnName(metaData.getColumnLabel(i).toUpperCase())
-                        .columnType(FieldTypeEnum.getFieldTypeBySqlType(metaData.getColumnType(i)));
-                tableInfoVO.fieldInfos.add(fieldInfoVO);
+            connection = getConnection(tableInfoVO);
+            String sql = "SELECT * FROM " + tableInfoVO.tableName;
+            preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<String> codeList = new ArrayList<>();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            String idCode = metaData.getColumnLabel(1);
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                codeList.add(metaData.getColumnLabel(i).toUpperCase());
             }
-        } catch (SQLException e) {
+            String codes = String.join(", ", codeList);
+            String idValue = "";
+            if (resultSet.next()) {
+                List<String> rowValues = new ArrayList<>();
+                idValue = DBUtils.getIdValue(resultSet.getString(1));
+                rowValues.add(idValue);
+                DBUtils.getRowValues(rowValues, DataTypeEnum.MYSQL, resultSet, metaData, null, null, null);
+                String values = String.join(", ", rowValues);
+                tableInfoVO.insertData("INSERT INTO " + tableInfoVO.tableName + " (" + codes + ") VALUES (" + values + ");");
+            }
+            tableInfoVO.insertSql = "SELECT * FROM " + tableInfoVO.tableName + " WHERE " + idCode + " = " + idValue + ";";
+            tableInfoVO.insertColumnName(codes, idCode);
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             close(connection, preparedStatement);
-            close(preparedStatement);
+        }
+    }
+
+    public static TableInfoVO initTableInfoVO(DemoConfigVO demoConfigVO) {
+        TableInfoVO tableInfoVO = TableInfoVO.builder()
+                .jdbcUrl(demoConfigVO.jdbcUrl)
+                .username(demoConfigVO.username)
+                .password(demoConfigVO.password)
+                .tableInfo("T_TABLE_NAME", "示例表");
+        tableInfoVO.indexInfos.add(IndexInfoVO.builder().indexColumnName("COL_NAME, CREATE_DATE").indexName("INDEX_T_NAME"));
+        tableInfoVO.fieldInfos.add(FieldInfoVO.builder().columnName("ID").columnType(FieldTypeEnum.VARCHAR)
+                .comment("主键").primary(PrimaryTypeEnum.PRIMARY));
+        tableInfoVO.fieldInfos.add(FieldInfoVO.builder().columnName("COL_NAME").columnType(FieldTypeEnum.VARCHAR)
+                .comment("字段注释"));
+        tableInfoVO.fieldInfos.add(FieldInfoVO.builder().columnName("CREATE_DATE").columnType(FieldTypeEnum.TIMESTAMP)
+                .comment("创建时间"));
+        tableInfoVO.insertSql = "SELECT * FROM " + tableInfoVO.tableName + " WHERE ID = '';";
+        tableInfoVO.insertColumnName("ID, COL_NAME, CREATE_DATE", "ID");
+        tableInfoVO.insertData("INSERT INTO " + tableInfoVO.tableName + " (ID, COL_NAME, CREATE_DATE) VALUES ('0279a59a333da6ee68dd7b3000400001', 'name', '2022-03-23 16:07:57');");
+        tableInfoVO.insertData("INSERT INTO " + tableInfoVO.tableName + " (ID, COL_NAME, CREATE_DATE) VALUES ('0279a59a333da6ee68dd7b3000400001', 'name', '2022-03-23 16:07:57');");
+        return tableInfoVO;
+    }
+
+    public static void addTableInfoAttri(TableInfoVO tableInfoVO) {
+
+        if (CollectionUtils.isEmpty(tableInfoVO.indexInfos)) {
+            tableInfoVO.indexInfos.add(IndexInfoVO.builder().indexColumnName("COL_NAME, CREATE_DATE").indexName("INDEX_T_NAME"));
+        }
+        if (CollectionUtils.isEmpty(tableInfoVO.fieldInfos)) {
+            tableInfoVO.fieldInfos.add(FieldInfoVO.builder().columnName("ID").columnType(FieldTypeEnum.VARCHAR)
+                    .comment("主键").primary(PrimaryTypeEnum.PRIMARY));
+            tableInfoVO.fieldInfos.add(FieldInfoVO.builder().columnName("COL_NAME").columnType(FieldTypeEnum.VARCHAR)
+                    .comment("字段注释"));
+            tableInfoVO.fieldInfos.add(FieldInfoVO.builder().columnName("CREATE_DATE").columnType(FieldTypeEnum.TIMESTAMP)
+                    .comment("创建时间"));
+        }
+        if (StringUtils.isEmpty(tableInfoVO.insertSql)) {
+            tableInfoVO.insertSql = "SELECT * FROM " + tableInfoVO.tableName + " WHERE ID = '';";
+        }
+        if (StringUtils.isEmpty(tableInfoVO.insertColumnName)) {
+            tableInfoVO.insertColumnName("ID, COL_NAME, CREATE_DATE", "ID");
+        }
+        if (StringUtils.isEmpty(tableInfoVO.insertData)) {
+            tableInfoVO.insertData("INSERT INTO " + tableInfoVO.tableName + " (ID, COL_NAME, CREATE_DATE) VALUES ('0279a59a333da6ee68dd7b3000400001', 'name', '2022-03-23 16:07:57');");
+            tableInfoVO.insertData("INSERT INTO " + tableInfoVO.tableName + " (ID, COL_NAME, CREATE_DATE) VALUES ('0279a59a333da6ee68dd7b3000400001', 'name', '2022-03-23 16:07:57');");
         }
     }
 
@@ -203,5 +328,6 @@ public class DBUtils {
         close(connection);
         close(preparedStatement);
     }
+
 
 }

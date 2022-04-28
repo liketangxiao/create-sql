@@ -5,6 +5,7 @@ import com.idea.plugin.sql.IProcedureService;
 import com.idea.plugin.sql.support.FieldInfoVO;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.idea.plugin.utils.FileUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,13 +17,13 @@ public class OracleProcedureAddColumnService extends BaseProcedureService {
         }
         IProcedureService procedureService = new OracleProcedureAddColumn();
         String comment = StringUtils.isEmpty(tableInfoVO.comment) ? tableInfoVO.tableComment + "新增数据" : tableInfoVO.comment;
-        writeFile(path, String.format(procedureService.getComment(), comment));
-        writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, tableInfoVO.tableName));
+        FileUtils.writeFile(path, String.format(procedureService.getComment(), comment));
+        FileUtils.writeFile(path, String.format(procedureService.getProcedure(), tableInfoVO.tableName, tableInfoVO.tableName));
         for (FieldInfoVO fieldVO : tableInfoVO.fieldInfos) {
             String alterAddColumnCall = String.format(procedureService.getCall(),
                     tableInfoVO.tableName, tableInfoVO.tableName, fieldVO.columnName, fieldVO.columnType.getOtype(fieldVO.columnTypeArgs), fieldVO.nullType.getCode(), fieldVO.comment);
-            writeFile(path, alterAddColumnCall);
+            FileUtils.writeFile(path, alterAddColumnCall);
         }
-        writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
+        FileUtils.writeFile(path, String.format(procedureService.getDrop(), tableInfoVO.tableName));
     }
 }

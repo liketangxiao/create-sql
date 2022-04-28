@@ -24,11 +24,19 @@ public class ControllerModeule extends TableModule {
         return imports;
     }
 
+    public String getEntityName() {
+        return FileTypePathEnum.ENTITY.getFileName(tableInfoVO.tableName);
+    }
+
     public String getVoName() {
         return FileTypePathEnum.VO.getFileName(tableInfoVO.tableName);
     }
 
     public String getServiceName() {
+        return FileTypePathEnum.SERVICE.getFileName(tableInfoVO.tableName);
+    }
+
+    public String getIserviceName() {
         return FileTypePathEnum.ISERVICE.getFileName(tableInfoVO.tableName);
     }
 

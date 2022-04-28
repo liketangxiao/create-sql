@@ -37,7 +37,7 @@ public interface ${simpleName} {
     * 通过ID查询单个${comment}
     *
     * @param ${idName} ID
-    * @return {@link ${entityName}}
+    * @return {@link ${voName}}
     */
     ${voName} findBy${idName?cap_first}(${idClass} ${idName});
 
