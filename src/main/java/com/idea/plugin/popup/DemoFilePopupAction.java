@@ -1,9 +1,11 @@
 package com.idea.plugin.popup;
 
 import com.idea.plugin.demo.DemoGenerateDialogWrapper;
+import com.idea.plugin.utils.ActionUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,8 @@ public class DemoFilePopupAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
         PsiFile requiredData = e.getRequiredData(CommonDataKeys.PSI_FILE);
+        Document document = requiredData.getViewProvider().getDocument();
+        ActionUtils.readDemoConfigByText(document.getText());
         String selectFilePath = requiredData.getViewProvider().getVirtualFile().getParent().getPath();
         DemoGenerateDialogWrapper classGenerateDialogWrapper = new DemoGenerateDialogWrapper(project);
         classGenerateDialogWrapper.fillData(project, selectFilePath);

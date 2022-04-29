@@ -38,8 +38,7 @@ public class CreateFileUtils {
         String oralcePath = getFilePath(DataTypeEnum.ORACLE, fileType, procedureVO.filePath, procedureVO.fileName, localDateTime);
         TableInfoVO initialTableInfoVO = TableInfoVO.builder();
         initialTableInfoVO.procedureVO(procedureVO);
-        initialTableInfoVO.procedureType.add(ProcedureTypeEnum.INITIAL);
-        tableInfoVOS.add(initialTableInfoVO);
+        addAllProcedure(mysqlPath, oralcePath, initialTableInfoVO, ProcedureTypeEnum.INITIAL);
         Class<TableInfoVO> tableInfoVOClass = TableInfoVO.class;
         for (TableInfoVO tableInfoVO : tableInfoVOS) {
             for (ProcedureTypeEnum procedureTypeEnum : tableInfoVO.procedureType) {
@@ -53,15 +52,19 @@ public class CreateFileUtils {
                         throw new SqlException(String.format("生成脚本类型：%s 属性值：%s不能为空", procedureTypeEnum.name(), fieldName));
                     }
                 }
-                BaseProcedureService mysqlProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.MYSQL);
-                BaseProcedureService oralceProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.ORACLE);
-                if (mysqlProcedureService != null) {
-                    mysqlProcedureService.addProcedure(mysqlPath, tableInfoVO);
-                }
-                if (oralceProcedureService != null) {
-                    oralceProcedureService.addProcedure(oralcePath, tableInfoVO);
-                }
+                addAllProcedure(mysqlPath, oralcePath, tableInfoVO, procedureTypeEnum);
             }
+        }
+    }
+
+    private static void addAllProcedure(String mysqlPath, String oralcePath, TableInfoVO tableInfoVO, ProcedureTypeEnum procedureTypeEnum) throws SqlException {
+        BaseProcedureService mysqlProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.MYSQL);
+        BaseProcedureService oralceProcedureService = DataProcedureTypeEnum.getProcedureService(procedureTypeEnum, DataTypeEnum.ORACLE);
+        if (mysqlProcedureService != null) {
+            mysqlProcedureService.addProcedure(mysqlPath, tableInfoVO);
+        }
+        if (oralceProcedureService != null) {
+            oralceProcedureService.addProcedure(oralcePath, tableInfoVO);
         }
     }
 

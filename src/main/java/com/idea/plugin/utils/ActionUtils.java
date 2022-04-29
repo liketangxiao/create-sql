@@ -1,7 +1,10 @@
 package com.idea.plugin.utils;
 
+import com.idea.plugin.demo.DemoConfigVO;
+import com.idea.plugin.demo.DemoSettings;
 import com.idea.plugin.sql.support.ProcedureVO;
 import com.idea.plugin.sql.support.TableInfoVO;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang3.StringUtils;
 
@@ -96,5 +99,39 @@ public class ActionUtils {
             Messages.showErrorDialog("配置文件转换失败: " + methodName + " " + e.getLocalizedMessage(), "错误");
         }
         return procedureVO;
+    }
+
+    public static void readDemoConfigByText(String text) {
+        DemoSettings demoSettings = DemoSettings.getInstance(ProjectManager.getInstance().getDefaultProject());
+        if (demoSettings.getDemoConfigVO() == null) {
+            return;
+        }
+        String[] properties = text.split("\n");
+        DemoConfigVO config = demoSettings.getDemoConfigVO();
+        config.tableName = null;
+        Class<DemoConfigVO> configClass = DemoConfigVO.class;
+        try {
+            Method[] configClassDeclaredMethods = configClass.getDeclaredMethods();
+            Map<String, Method> configMethodMap = Arrays.stream(configClassDeclaredMethods).collect(Collectors.toMap(Method::getName, Function.identity()));
+            for (int i = 0; i < properties.length && i < 8; i++) {
+                String property = properties[i];
+                property = property.trim();
+                if (StringUtils.isEmpty(property) || property.startsWith("#") || property.startsWith("--") || !property.contains(":")) {
+                    continue;
+                }
+                int index = property.indexOf(":");
+                String methodName = property.substring(0, index).trim();
+                Object[] args = Arrays.stream(property.substring(index + 1).split(";")).map(String::trim).toArray();
+                if (args.length == 0) {
+                    continue;
+                }
+                methodName = "set" + methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+                Method procedureMethod = configMethodMap.get(methodName);
+                if (procedureMethod != null) {
+                    procedureMethod.invoke(config, args);
+                }
+            }
+        } catch (Exception ignored) {
+        }
     }
 }

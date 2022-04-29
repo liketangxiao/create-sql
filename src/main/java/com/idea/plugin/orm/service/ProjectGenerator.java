@@ -26,7 +26,7 @@ public class ProjectGenerator extends GeneratorConfig {
         try {
             getFileTypeInfo(context);
             TableModuleFactory.createTableModule(context);
-            FileUtils.writeFile(context.getFileTypeInfo().getAbsulotePath(), getTemplate(context));
+            FileUtils.writeFileDelete(context.getFileTypeInfo().getAbsulotePath(), getTemplate(context));
         } catch (Exception e) {
             throw new RuntimeException(e.getLocalizedMessage());
         }

@@ -58,7 +58,7 @@ public class BuildService {
                 FileUtils.copyFile(targetPath, path);
                 String pathtxt = absolutePath + "/增量地址.txt";
                 if (!FileUtils.readFile(pathtxt).contains(filePathStr)) {
-                    FileUtils.writeFileAdd(pathtxt, filePathStr + "\n");
+                    FileUtils.writeFile(pathtxt, filePathStr + "\n");
                 }
                 Messages.showMessageDialog("增量文件导入成功, 路径: " + path, "正确", Messages.getInformationIcon());
             } catch (Exception ex) {

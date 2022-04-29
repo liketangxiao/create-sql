@@ -11,22 +11,6 @@ import java.util.List;
 
 public class FileUtils {
 
-    public static void writeFile(String path, String fileStr) throws SqlException {
-        if (StringUtils.isEmpty(path) || StringUtils.isEmpty(fileStr)) {
-            return;
-        }
-        File file = new File(path);
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), StandardCharsets.UTF_8));
-            bw.write(fileStr);
-            bw.close();
-        } catch (Exception e) {
-            throw new SqlException(e.getLocalizedMessage());
-        }
-    }
 
     public static List<String> readFile(String path) {
         File file = new File(path);
@@ -44,7 +28,7 @@ public class FileUtils {
         return result;
     }
 
-    public static void writeFileAdd(String path, String fileStr) throws SqlException {
+    public static void writeFile(String path, String fileStr) throws SqlException {
         if (StringUtils.isEmpty(path) || StringUtils.isEmpty(fileStr)) {
             return;
         }
@@ -56,6 +40,15 @@ public class FileUtils {
             throw new SqlException(e.getLocalizedMessage());
         }
     }
+
+    public static void writeFileDelete(String path, String fileStr) throws SqlException {
+        File file = new File(path);
+        if (file.exists()) {
+            file.delete();
+        }
+        writeFile(path, fileStr);
+    }
+
 
     public static void copyFile(String path, String newPath) throws IOException {
         File newfile = new File(newPath);

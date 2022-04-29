@@ -66,7 +66,8 @@ public class DemoFileStrUtils {
                         args = NullTypeEnum.NOT_NULL.name();
                     }
                     if (args != null) {
-                        tableInfoStr.append("fieldInfos:").append(fieldInfo.columnName).append("; ").append(fieldInfo.columnType.getType(fieldInfo.columnTypeArgs)).append("; ").append(fieldInfo.comment).append("; ").append(args).append("\n");;
+                        tableInfoStr.append("fieldInfos:").append(fieldInfo.columnName).append("; ").append(fieldInfo.columnType.getType(fieldInfo.columnTypeArgs)).append("; ").append(fieldInfo.comment).append("; ").append(args).append("\n");
+                        ;
                     } else {
                         tableInfoStr.append("fieldInfos:").append(fieldInfo.columnName).append("; ").append(fieldInfo.columnType.getType(fieldInfo.columnTypeArgs)).append("; ").append(fieldInfo.comment).append("\n");
                     }
@@ -113,7 +114,7 @@ public class DemoFileStrUtils {
         for (TableInfoVO tableInfoVO : configVO.getTableInfoVOS()) {
             List<String> fileCreateTypes = Arrays.stream(ProcedureTypeEnum.values()).filter(procedureTypeEnum -> procedureTypeEnum.getFileCreateType() != null)
                     .map(Enum::name).collect(Collectors.toList());
-            String  fileCreateType = configVO.getProcedureTypeList().stream().filter(fileCreateTypes::contains).collect(Collectors.joining(", "));
+            String fileCreateType = configVO.getProcedureTypeList().stream().filter(fileCreateTypes::contains).collect(Collectors.joining(", "));
             String tableInfoStr = "-- 示例" + fileCreateType + "\n" +
                     "procedureType:" + fileCreateType + "\n" +
                     "tableInfo:" + tableInfoVO.tableName + "\n";

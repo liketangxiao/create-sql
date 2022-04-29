@@ -4,14 +4,10 @@ import com.idea.plugin.ui.CreateDemoFileUI;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
 public class DemoGenerateDialogWrapper extends DialogWrapper {
-
-    private static final Logger logger = LoggerFactory.getLogger(DemoGenerateDialogWrapper.class);
 
     private CreateDemoFileUI createDemoFileUI = new CreateDemoFileUI();
 
@@ -20,7 +16,8 @@ public class DemoGenerateDialogWrapper extends DialogWrapper {
 
     public DemoGenerateDialogWrapper(@Nullable Project project) {
         super(project);
-        setCancelButtonText("Cancel");
+        setOKButtonText("确认");
+        setCancelButtonText("取消");
         super.init();
     }
 
@@ -47,7 +44,7 @@ public class DemoGenerateDialogWrapper extends DialogWrapper {
     public void fillData(Project project, String selectFilePath) {
         this.project = project;
         this.selectFilePath = selectFilePath;
-        createDemoFileUI.fillData(project,selectFilePath);
+        createDemoFileUI.fillData(project, selectFilePath);
     }
 
 }

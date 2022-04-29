@@ -59,7 +59,7 @@ public class CreateDemoFileUI {
     private JTextField tableName;
 
     private Project project;
-    private DemoSettings config;
+    public DemoSettings config;
     private String selectFilePath;
 
     public CreateDemoFileUI() {
@@ -80,7 +80,7 @@ public class CreateDemoFileUI {
         exportSqlButton.addActionListener(e -> {
             try {
                 getDemoConfigVOFromDB();
-                exportDemoFile(config.getDemoConfigVO().fileName + "_sql.txt", DemoFileStrUtils.sqlFileStr(config.getDemoConfigVO()));
+                exportDemoFile(config.getDemoConfigVO().username + "_sql.txt", DemoFileStrUtils.sqlFileStr(config.getDemoConfigVO()));
             } catch (Exception ex) {
                 Messages.showMessageDialog("sql配置文件创建失败: " + ex.getLocalizedMessage(), "错误", Messages.getErrorIcon());
                 return;
@@ -90,7 +90,7 @@ public class CreateDemoFileUI {
         exportJavaButton.addActionListener(e -> {
             try {
                 getDemoConfigVOFromDB();
-                exportDemoFile(config.getDemoConfigVO().fileName + "_java.txt", DemoFileStrUtils.javaFileStr(config.getDemoConfigVO()));
+                exportDemoFile(config.getDemoConfigVO().username + "_java.txt", DemoFileStrUtils.javaFileStr(config.getDemoConfigVO()));
             } catch (Exception ex) {
                 Messages.showMessageDialog("java配置文件创建失败: " + ex.getLocalizedMessage(), "错误", Messages.getErrorIcon());
                 return;
@@ -234,7 +234,7 @@ public class CreateDemoFileUI {
         if (file == null) {
             return;
         }
-        FileUtils.writeFile(file.getAbsolutePath() + "/" + demoFileName, demoFileString);
+        FileUtils.writeFileDelete(file.getAbsolutePath() + "/" + demoFileName, demoFileString);
     }
 
     public JComponent getMianPanel() {
