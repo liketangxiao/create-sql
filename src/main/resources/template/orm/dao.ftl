@@ -30,6 +30,22 @@ public interface ${simpleName} {
     int update${entityName}(@Param("${entityName?uncap_first}") ${entityName} ${entityName?uncap_first});
 
     /**
+    * 批量插入${comment}
+    *
+    * @param ${entityName?uncap_first}S ${comment}列表
+    * @return int
+    */
+    int batchInsert${entityName}(@Param("${entityName?uncap_first}S") List<${entityName}> ${entityName?uncap_first}S);
+
+    /**
+    * 批量更新${comment}
+    *
+    * @param ${entityName?uncap_first}S ${comment}列表
+    * @return int
+    */
+    int batchUpdate${entityName}(@Param("${entityName?uncap_first}S") List<${entityName}> ${entityName?uncap_first}S);
+
+    /**
     * 通过ID删除单个${comment}
     *
     * @param ${idName} ID

@@ -15,19 +15,11 @@ public class DaoModeule extends TableModule {
 
     public Set<String> getImports() {
         Set<String> imports = new HashSet<>();
-        fileTypeInfo.setImports(FileTypePathEnum.ENTITY, imports, tableInfoVO.tableName);
+        fileTypeInfo.setImports(FileTypePathEnum.DO, imports, tableInfoVO.tableName);
         fileTypeInfo.setImports(FileTypePathEnum.VO, imports, tableInfoVO.tableName);
         imports.add("org.apache.ibatis.annotations.*");
         imports.add("java.util.List");
         return imports;
-    }
-
-    public String getEntityName() {
-        return FileTypePathEnum.ENTITY.getFileName(tableInfoVO.tableName);
-    }
-
-    public String getVoName() {
-        return FileTypePathEnum.VO.getFileName(tableInfoVO.tableName);
     }
 
 }

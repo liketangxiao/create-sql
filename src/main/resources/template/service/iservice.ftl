@@ -27,6 +27,20 @@ public interface ${simpleName} {
     int update${voName}(${voName} ${voName?uncap_first});
 
     /**
+    * 批量插入${comment}
+    *
+    * @param ${voName?uncap_first}S ${comment}列表
+    */
+    int batchInsert${voName}(List<${voName}> ${voName?uncap_first}S);
+
+    /**
+    * 批量更新${comment}
+    *
+    * @param ${voName?uncap_first}S ${comment}列表
+    */
+    int batchUpdate${voName}(List<${voName}> ${voName?uncap_first}S);
+
+    /**
     * 通过ID删除单个${comment}
     *
     * @param ${idName} ID

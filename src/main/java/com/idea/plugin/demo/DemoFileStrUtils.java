@@ -117,7 +117,12 @@ public class DemoFileStrUtils {
             String fileCreateType = configVO.getProcedureTypeList().stream().filter(fileCreateTypes::contains).collect(Collectors.joining(", "));
             String tableInfoStr = "-- 示例" + fileCreateType + "\n" +
                     "procedureType:" + fileCreateType + "\n" +
-                    "tableInfo:" + tableInfoVO.tableName + "\n";
+                    "tableInfo:" + tableInfoVO.tableName + "\n"+
+                    "controllerReturn:com.epoch.infrastructure.util.model.ResultValue;\n" +
+                    "doPath:/model/entity;/model/vo\n" +
+                    "daoPath:/dao;/dao/mysql;/dao/oracle;\n" +
+                    "servicePath:/service;/service/impl\n" +
+                    "controllerPath:/controller\n";
             javaFileStr.append(tableInfoStr).append("\n");
         }
         return javaFileStr.toString();

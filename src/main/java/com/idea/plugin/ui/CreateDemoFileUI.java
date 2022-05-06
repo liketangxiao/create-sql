@@ -204,7 +204,10 @@ public class CreateDemoFileUI {
         } else {
             for (String tableName : tableNameList) {
                 if (demoConfigVO.tableInfoCacheMap.containsKey(tableName)) {
-                    tableInfoVOS.add(demoConfigVO.tableInfoCacheMap.get(tableName));
+                    TableInfoVO tableInfoVO = demoConfigVO.tableInfoCacheMap.get(tableName);
+                    DBUtils.getTableDataInfo(tableInfoVO);
+                    DBUtils.addTableInfoAttri(tableInfoVO);
+                    tableInfoVOS.add(tableInfoVO);
                 } else {
                     TableInfoVO tableInfoVO = TableInfoVO.builder()
                             .jdbcUrl(demoConfigVO.jdbcUrl)

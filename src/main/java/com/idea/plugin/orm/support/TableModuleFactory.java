@@ -6,7 +6,7 @@ public class TableModuleFactory {
     public static void createTableModule(GeneratorContext context) {
         TableModule tableModule = null;
         switch (context.getFileType()) {
-            case ENTITY:
+            case DO:
                 tableModule = new EntityModeule(context);
                 break;
             case VO:
@@ -17,6 +17,12 @@ public class TableModuleFactory {
                 break;
             case MAPPER:
                 tableModule = new MapperModeule(context);
+                break;
+            case MAPPER_MYSQL:
+                tableModule = new MapperMysqlModeule(context);
+                break;
+            case MAPPER_ORACLE:
+                tableModule = new MapperOracleModeule(context);
                 break;
             case SERVICE:
                 tableModule = new ServiceModeule(context);

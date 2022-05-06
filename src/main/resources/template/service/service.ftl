@@ -27,6 +27,16 @@ public class ${simpleName} implements ${iserviceName} {
     }
 
     @Override
+    public int batchInsert${voName}(List<${voName}> ${voName?uncap_first}S){
+        return ${mapperName?uncap_first}.batchInsert${entityName?cap_first}(new ArrayList<>(${voName?uncap_first}S));
+    }
+
+    @Override
+    public int batchUpdate${voName}(List<${voName}> ${voName?uncap_first}S){
+        return ${mapperName?uncap_first}.batchUpdate${entityName?cap_first}(new ArrayList<>(${voName?uncap_first}S));
+    }
+
+    @Override
     public int deleteBy${idName?cap_first}(${idClass} ${idName}) {
         return ${mapperName?uncap_first}.deleteBy${idName?cap_first}(${idName});
     }

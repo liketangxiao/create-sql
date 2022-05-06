@@ -1,6 +1,7 @@
 package com.idea.plugin.orm.support;
 
 import com.google.common.base.CaseFormat;
+import com.idea.plugin.orm.support.enums.FileTypePathEnum;
 import com.idea.plugin.sql.support.FieldInfoVO;
 import com.idea.plugin.sql.support.TableInfoVO;
 import com.idea.plugin.sql.support.enums.PrimaryTypeEnum;
@@ -63,7 +64,7 @@ public abstract class TableModule {
     }
 
     public String getIdClass() {
-        return getIdColumn().columnType.getJclass().getName();
+        return getIdColumn().columnType.getJclass().getSimpleName();
     }
 
     public String getTableName() {
@@ -80,6 +81,26 @@ public abstract class TableModule {
 
     public String getDate() {
         return tableInfoVO.date;
+    }
+
+    public String getEntityName() {
+        return FileTypePathEnum.DO.getFileName(tableInfoVO.tableName);
+    }
+
+    public String getVoName() {
+        return FileTypePathEnum.VO.getFileName(tableInfoVO.tableName);
+    }
+
+    public String getMapperName() {
+        return FileTypePathEnum.MAPPER.getFileName(tableInfoVO.tableName);
+    }
+
+    public String getIserviceName() {
+        return FileTypePathEnum.ISERVICE.getFileName(tableInfoVO.tableName);
+    }
+
+    public String getServiceName() {
+        return FileTypePathEnum.SERVICE.getFileName(tableInfoVO.tableName);
     }
 
 }

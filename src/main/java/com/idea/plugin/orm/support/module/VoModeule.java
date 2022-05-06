@@ -15,13 +15,7 @@ public class VoModeule extends TableModule {
 
     public Set<String> getImports() {
         Set<String> imports = new HashSet<>();
-        fileTypeInfo.setImports(FileTypePathEnum.ENTITY, imports, tableInfoVO.tableName);
+        fileTypeInfo.setImports(FileTypePathEnum.DO, imports, tableInfoVO.tableName);
         return imports;
     }
-
-
-    public String getEntityName() {
-        return FileTypePathEnum.ENTITY.getFileName(tableInfoVO.tableName);
-    }
-
 }

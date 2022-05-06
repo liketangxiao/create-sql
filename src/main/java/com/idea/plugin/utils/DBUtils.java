@@ -180,9 +180,7 @@ public class DBUtils {
                 tableInfoVO.indexInfos.add(IndexInfoVO.builder().indexColumnName(columnName).indexName(indexName));
             }
             ResultSet columns = metaData.getColumns(tableInfoVO.schema, tableInfoVO.schema, tableInfoVO.tableName, null);
-            int maxCount = 0;
-            while (columns.next() && maxCount < 20) {
-                maxCount++;
+            while (columns.next()) {
                 String columnName = columns.getString("COLUMN_NAME");
                 String remarks = columns.getString("REMARKS");
                 String isNullable = columns.getString("IS_NULLABLE");

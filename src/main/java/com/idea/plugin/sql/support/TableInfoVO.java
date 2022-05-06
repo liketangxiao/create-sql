@@ -22,6 +22,17 @@ public class TableInfoVO {
     public String author;
     public String dataType;
     public String schema;
+
+    public String doPath;
+    public String voPath;
+    public String daoPath;
+    public String daoMysqlPath;
+    public String daoOraclePath;
+    public String servicePath;
+    public String iservicePath;
+    public String controllerPath;
+    public String controllerReturn;
+
     public List<ProcedureTypeEnum> procedureType = new ArrayList<>();
     public String comment;
     public String filePath;
@@ -56,6 +67,35 @@ public class TableInfoVO {
         this.jdbcUrl = procedureVO.jdbcUrl;
         this.username = procedureVO.username;
         this.password = procedureVO.password;
+        return this;
+    }
+
+    public TableInfoVO doPath(String doPath, String voPath) {
+        this.doPath = doPath;
+        this.voPath = voPath;
+        return this;
+    }
+
+    public TableInfoVO daoPath(String daoPath, String daoMysqlPath, String daoOraclePath) {
+        this.daoPath = daoPath;
+        this.daoMysqlPath = daoMysqlPath;
+        this.daoOraclePath = daoOraclePath;
+        return this;
+    }
+
+    public TableInfoVO servicePath(String iservicePath, String servicePath) {
+        this.iservicePath = iservicePath;
+        this.servicePath = servicePath;
+        return this;
+    }
+
+    public TableInfoVO controllerPath(String controllerPath) {
+        this.controllerPath = controllerPath;
+        return this;
+    }
+
+    public TableInfoVO controllerReturn(String controllerReturn) {
+        this.controllerReturn = controllerReturn;
         return this;
     }
 

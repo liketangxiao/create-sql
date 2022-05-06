@@ -11,19 +11,11 @@ public class MapperModeule extends TableModule {
     }
 
     public String getEntityNamePath() {
-        return (FileTypePathEnum.ENTITY.getJavapath(fileTypeInfo.getModulePath()) + "/" + FileTypePathEnum.ENTITY.getFileName(tableInfoVO.tableName)).replaceAll("/", ".");
+        return (FileTypePathEnum.DO.getJavapath(fileTypeInfo.getModulePath()) + "/" + FileTypePathEnum.DO.getFileName(tableInfoVO.tableName)).replaceAll("/", ".");
     }
 
     public String getMapperNamePath() {
         return (FileTypePathEnum.MAPPER.getJavapath(fileTypeInfo.getModulePath()) + "/" + FileTypePathEnum.MAPPER.getFileName(tableInfoVO.tableName)).replaceAll("/", ".");
-    }
-
-    public String getEntityName() {
-        return FileTypePathEnum.ENTITY.getFileName(tableInfoVO.tableName);
-    }
-
-    public String getVoName() {
-        return FileTypePathEnum.VO.getFileName(tableInfoVO.tableName);
     }
 
 }

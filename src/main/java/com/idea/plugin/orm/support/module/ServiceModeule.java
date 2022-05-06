@@ -16,34 +16,14 @@ public class ServiceModeule extends TableModule {
     public Set<String> getImports() {
         Set<String> imports = new HashSet<>();
         fileTypeInfo.setImports(FileTypePathEnum.VO, imports, tableInfoVO.tableName);
-        fileTypeInfo.setImports(FileTypePathEnum.ENTITY, imports, tableInfoVO.tableName);
         fileTypeInfo.setImports(FileTypePathEnum.MAPPER, imports, tableInfoVO.tableName);
         fileTypeInfo.setImports(FileTypePathEnum.ISERVICE, imports, tableInfoVO.tableName);
         imports.add("org.springframework.beans.factory.annotation.Autowired");
         imports.add("org.springframework.stereotype.Service");
+        imports.add("java.util.ArrayList");
         imports.add("java.util.List");
 
         return imports;
-    }
-
-    public String getEntityName() {
-        return FileTypePathEnum.ENTITY.getFileName(tableInfoVO.tableName);
-    }
-
-    public String getVoName() {
-        return FileTypePathEnum.VO.getFileName(tableInfoVO.tableName);
-    }
-
-    public String getMapperName() {
-        return FileTypePathEnum.MAPPER.getFileName(tableInfoVO.tableName);
-    }
-
-    public String getServiceName() {
-        return FileTypePathEnum.SERVICE.getFileName(tableInfoVO.tableName);
-    }
-
-    public String getIserviceName() {
-        return FileTypePathEnum.ISERVICE.getFileName(tableInfoVO.tableName);
     }
 
 }

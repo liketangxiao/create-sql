@@ -1,5 +1,7 @@
 package com.idea.plugin.utils;
 
+import com.idea.plugin.demo.DemoConfigVO;
+import com.idea.plugin.demo.DemoSettings;
 import com.idea.plugin.orm.service.ProjectGenerator;
 import com.idea.plugin.orm.support.GeneratorContext;
 import com.idea.plugin.orm.support.enums.FileTypePathEnum;
@@ -11,6 +13,7 @@ import com.idea.plugin.sql.support.enums.DataTypeEnum;
 import com.idea.plugin.sql.support.enums.FileDDLTypeEnum;
 import com.idea.plugin.sql.support.enums.ProcedureTypeEnum;
 import com.idea.plugin.sql.support.exception.SqlException;
+import com.intellij.openapi.project.ProjectManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -95,6 +98,16 @@ public class CreateFileUtils {
         ProjectGenerator projectGenerator = new ProjectGenerator();
         Class<TableInfoVO> tableInfoVOClass = TableInfoVO.class;
         for (TableInfoVO tableInfoVO : tableInfoVOS) {
+            DemoSettings demoSettings = DemoSettings.getInstance(ProjectManager.getInstance().getDefaultProject());
+            DemoConfigVO demoConfigVO = demoSettings.getDemoConfigVO();
+            if (demoConfigVO.tableInfoCacheMap.containsKey(tableInfoVO.tableName)) {
+                TableInfoVO tableInfoVOCache = demoConfigVO.tableInfoCacheMap.get(tableInfoVO.tableName);
+                tableInfoVO.tableComment = tableInfoVOCache.tableComment;
+                tableInfoVO.fieldInfos = tableInfoVOCache.fieldInfos;
+            } else {
+                DBUtils.getTableInfoVOFromDB(tableInfoVO);
+                demoConfigVO.tableInfoCacheMap.put(tableInfoVO.tableName, tableInfoVO);
+            }
             for (ProcedureTypeEnum procedureTypeEnum : tableInfoVO.procedureType) {
                 if (procedureTypeEnum == null || procedureTypeEnum.getFileCreateType() == null) {
                     continue;
@@ -106,7 +119,6 @@ public class CreateFileUtils {
                         throw new SqlException(String.format("生成脚本类型：%s 属性值：%s不能为空", procedureTypeEnum.name(), fieldName));
                     }
                 }
-                DBUtils.getTableInfoVOFromDB(tableInfoVO);
                 for (FileTypePathEnum fileTypePathEnum : procedureTypeEnum.getFileCreateType().getFileTypePathList()) {
                     GeneratorContext context = new GeneratorContext(tableInfoVO, fileTypePathEnum);
                     projectGenerator.generationFile(context);

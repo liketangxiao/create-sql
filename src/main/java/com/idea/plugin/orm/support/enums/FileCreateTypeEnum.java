@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum FileCreateTypeEnum {
-    DO(Arrays.asList(FileTypePathEnum.ENTITY, FileTypePathEnum.VO)),
-    DAO(Arrays.asList(FileTypePathEnum.DAO, FileTypePathEnum.MAPPER)),
+    DO(Arrays.asList(FileTypePathEnum.DO, FileTypePathEnum.VO)),
+    DAO(Arrays.asList(FileTypePathEnum.DAO, FileTypePathEnum.MAPPER, FileTypePathEnum.MAPPER_MYSQL, FileTypePathEnum.MAPPER_ORACLE)),
     SERVICE(Arrays.asList(FileTypePathEnum.ISERVICE, FileTypePathEnum.SERVICE)),
     CONTROLLER(Arrays.asList(FileTypePathEnum.CONTROLLER)),
     ;

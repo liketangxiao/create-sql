@@ -52,7 +52,7 @@ public class ProjectGenerator extends GeneratorConfig {
         if (moduleFullName.lastIndexOf(".") > 0) {
             moduleName = moduleFullName.substring(moduleFullName.lastIndexOf(".") + 1);
         }
-        String packgPath = fileTypePathEnum.getJavapath(subModulePath);
+        String packgPath = fileTypePathEnum.getJavapath(subModulePath, tableInfoVO);
         String fileName = fileTypePathEnum.getFileName(tableInfoVO.tableName);
         VirtualFile virtualFile = createPackageDir(modulePath + "/" + fileType.getPath() + packgPath);
         fileTypeInfo.setModulePath(subModulePath);

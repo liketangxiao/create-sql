@@ -22,9 +22,10 @@ public class ${simpleName} {
     *
     * @param ${voName?uncap_first} ${comment}
     */
-    @RequestMapping(method = RequestMethod.POST, value = "/save${name}")
-    public Object save${voName}(@RequestBody ${voName} ${voName?uncap_first}) {
-        return ${serviceName?uncap_first}.insert${voName}(${voName?uncap_first});
+    @RequestMapping(method = RequestMethod.POST, value = "/save${name?cap_first}")
+    public ${return}<#noparse><</#noparse>${voName}> save${voName}(@RequestBody ${voName} ${voName?uncap_first}) {
+        int i = ${serviceName?uncap_first}.insert${voName}(${voName?uncap_first});
+        return new ${return}(${voName?uncap_first});
     }
 
     /**
@@ -32,9 +33,32 @@ public class ${simpleName} {
     *
     * @param ${voName?uncap_first} ${comment}
     */
-    @RequestMapping(method = RequestMethod.POST, value = "/update${name}")
-    public Object update${voName}(@RequestBody ${voName} ${voName?uncap_first}) {
-        return ${serviceName?uncap_first}.update${voName}(${voName?uncap_first});
+    @RequestMapping(method = RequestMethod.POST, value = "/update${name?cap_first}")
+    public ${return}<#noparse><</#noparse>${voName}> update${voName}(@RequestBody ${voName} ${voName?uncap_first}) {
+        int i = ${serviceName?uncap_first}.update${voName}(${voName?uncap_first});
+        return new ${return}(${voName?uncap_first});
+    }
+
+    /**
+    * 批量插入${comment}
+    *
+    * @param ${voName?uncap_first}S ${comment}列表
+    */
+    @RequestMapping(method = RequestMethod.POST, value = "/batchInsert${name?cap_first}")
+    public ${return}<#noparse><</#noparse>List<#noparse><</#noparse>${voName}>> batchInsert${voName}(List<${voName}> ${voName?uncap_first}S){
+        int i = ${serviceName?uncap_first}.batchInsert${voName?cap_first}(${voName?uncap_first}S);
+        return new ${return}(${voName?uncap_first}S);
+    }
+
+    /**
+    * 批量更新${comment}
+    *
+    * @param ${voName?uncap_first}S ${comment}列表
+    */
+    @RequestMapping(method = RequestMethod.POST, value = "/batchUpdate${name?cap_first}")
+    public ${return}<#noparse><</#noparse>List<#noparse><</#noparse>${voName}>> batchUpdate${voName}(List<${voName}> ${voName?uncap_first}S){
+        int i = ${serviceName?uncap_first}.batchUpdate${voName?cap_first}(${voName?uncap_first}S);
+        return new ${return}(${voName?uncap_first}S);
     }
 
     /**
@@ -43,30 +67,31 @@ public class ${simpleName} {
     * @param ${idName} ID
     */
     @RequestMapping(method = RequestMethod.POST, value = "/deleteBy${idName?cap_first}")
-    public Object deleteBy${idName?cap_first}(${idClass} ${idName}) {
-        return ${serviceName?uncap_first}.deleteBy${idName?cap_first}(${idName});
+    public ${return}<#noparse><</#noparse>${voName}> deleteBy${idName?cap_first}(${idClass} ${idName}) {
+        int i = ${serviceName?uncap_first}.deleteBy${idName?cap_first}(${idName});
+        return new ${return}(${idName});
     }
 
     /**
     * 通过ID查询单个${comment}
     *
     * @param ${idName} ID
-    * @return {@link ${voName}}
     */
     @RequestMapping(method = RequestMethod.POST, value = "/findBy${idName?cap_first}")
-    public Object findBy${idName?cap_first}(${idClass} ${idName}) {
-        return ${serviceName?uncap_first}.findBy${idName?cap_first}(${idName});
+    public ${return}<#noparse><</#noparse>${voName}> findBy${idName?cap_first}(${idClass} ${idName}) {
+        ${voName} ${voName?uncap_first} = ${serviceName?uncap_first}.findBy${idName?cap_first}(${idName});
+        return new ${return}(${voName?uncap_first});
     }
 
     /**
     * 通过条件查询${comment}
     *
     * @param ${voName?uncap_first} ${comment}
-    * @return {@link List<${voName}>}
     */
-    @RequestMapping(method = RequestMethod.POST, value = "/findBy${name}")
-    public Object findBy${voName}(@RequestBody ${voName} ${voName?uncap_first}) {
-        return ${serviceName?uncap_first}.findBy${voName}(${voName?uncap_first});
+    @RequestMapping(method = RequestMethod.POST, value = "/findBy${name?cap_first}")
+    public ${return}<#noparse><</#noparse>List<#noparse><</#noparse>${voName}>> findBy${voName}(@RequestBody ${voName} ${voName?uncap_first}) {
+        List<${voName}> ${voName?uncap_first}S = ${serviceName?uncap_first}.findBy${voName}(${voName?uncap_first});
+        return new ${return}(${voName?uncap_first}S);
     }
 
     /**
@@ -74,9 +99,10 @@ public class ${simpleName} {
     *
     * @return {@link List<${voName}>}
     */
-    @RequestMapping(method = RequestMethod.GET, value = "/findAll${name}")
-    public Object findAll${voName}() {
-        return ${serviceName?uncap_first}.findAll${voName}();
+    @RequestMapping(method = RequestMethod.GET, value = "/findAll${name?cap_first}")
+    public ${return}<#noparse><</#noparse>List<#noparse><</#noparse>${voName}>> findAll${voName}() {
+        List<${voName}> ${voName?uncap_first}S = ${serviceName?uncap_first}.findAll${voName}();
+        return new ${return}(${voName?uncap_first}S);
     }
 
 }
