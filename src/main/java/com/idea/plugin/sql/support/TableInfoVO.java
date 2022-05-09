@@ -12,10 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TableInfoVO {
@@ -176,8 +174,19 @@ public class TableInfoVO {
         if (StringUtils.isEmpty(indexName) || StringUtils.isEmpty(indexColumnName)) {
             return this;
         }
-        IndexInfoVO indexInfoVO = IndexInfoVO.builder().indexName(indexName.toUpperCase()).indexColumnName(indexColumnName.toUpperCase());
-        this.indexInfos.add(indexInfoVO);
+        if (CollectionUtils.isNotEmpty(this.indexInfos)) {
+            Map<String, IndexInfoVO> indexInfoMap = this.indexInfos.stream().collect(Collectors.toMap(indexInfoVO -> indexInfoVO.indexName, Function.identity()));
+            if (indexInfoMap.containsKey(indexName)) {
+                indexColumnName = indexInfoMap.get(indexName).indexColumnName + ", " + indexColumnName;
+                indexInfoMap.get(indexName).indexColumnName(indexColumnName);
+            } else {
+                IndexInfoVO indexInfoVO = IndexInfoVO.builder().indexName(indexName.toUpperCase()).indexColumnName(indexColumnName.toUpperCase());
+                this.indexInfos.add(indexInfoVO);
+            }
+        } else {
+            IndexInfoVO indexInfoVO = IndexInfoVO.builder().indexName(indexName.toUpperCase()).indexColumnName(indexColumnName.toUpperCase());
+            this.indexInfos.add(indexInfoVO);
+        }
         return this;
     }
 

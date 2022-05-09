@@ -115,7 +115,7 @@ public class DBUtils {
                 Class.forName("com.mysql.jdbc.Driver");
                 int i = tableInfoVO.jdbcUrl.lastIndexOf("/");
                 Connection connection = DriverManager.getConnection(tableInfoVO.jdbcUrl + "?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false", properties);
-                tableInfoVO.schema = connection.getSchema();
+                tableInfoVO.schema = connection.getCatalog();
                 tableInfoVO.dataType = DataTypeEnum.MYSQL.getCode();
                 return connection;
             } else if (tableInfoVO.jdbcUrl.contains(DataTypeEnum.ORACLE.getCode())) {
@@ -177,7 +177,7 @@ public class DBUtils {
                 if (StringUtils.isEmpty(columnName) || primaryKey.equals(columnName)) {
                     continue;
                 }
-                tableInfoVO.indexInfos.add(IndexInfoVO.builder().indexColumnName(columnName).indexName(indexName));
+                tableInfoVO.indexInfos(indexName, columnName);
             }
             ResultSet columns = metaData.getColumns(tableInfoVO.schema, tableInfoVO.schema, tableInfoVO.tableName, null);
             while (columns.next()) {

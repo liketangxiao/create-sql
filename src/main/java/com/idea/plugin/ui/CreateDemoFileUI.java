@@ -1,7 +1,6 @@
 package com.idea.plugin.ui;
 
 import com.google.common.base.CaseFormat;
-import com.idea.plugin.demo.DemoConfigVO;
 import com.idea.plugin.demo.DemoFileStrUtils;
 import com.idea.plugin.demo.DemoSettings;
 import com.idea.plugin.sql.support.TableInfoVO;
@@ -195,34 +194,33 @@ public class CreateDemoFileUI {
 
     private void getDemoConfigVOFromDB() {
         fillData(project, selectFilePath);
-        DemoConfigVO demoConfigVO = config.getDemoConfigVO();
-        List<String> tableNameList = demoConfigVO.getTableNameList();
+        List<String> tableNameList = config.getDemoConfigVO().getTableNameList();
         List<TableInfoVO> tableInfoVOS = new ArrayList<>();
         if (CollectionUtils.isEmpty(tableNameList)) {
-            TableInfoVO tableInfoVO = DBUtils.initTableInfoVO(demoConfigVO);
+            TableInfoVO tableInfoVO = DBUtils.initTableInfoVO(config.getDemoConfigVO());
             tableInfoVOS.add(tableInfoVO);
         } else {
             for (String tableName : tableNameList) {
-                if (demoConfigVO.tableInfoCacheMap.containsKey(tableName)) {
-                    TableInfoVO tableInfoVO = demoConfigVO.tableInfoCacheMap.get(tableName);
+                if (config.getDemoConfigVO().tableInfoCacheMap.containsKey(tableName)) {
+                    TableInfoVO tableInfoVO = config.getDemoConfigVO().tableInfoCacheMap.get(tableName);
                     DBUtils.getTableDataInfo(tableInfoVO);
                     DBUtils.addTableInfoAttri(tableInfoVO);
                     tableInfoVOS.add(tableInfoVO);
                 } else {
                     TableInfoVO tableInfoVO = TableInfoVO.builder()
-                            .jdbcUrl(demoConfigVO.jdbcUrl)
-                            .username(demoConfigVO.username)
-                            .password(demoConfigVO.password)
+                            .jdbcUrl(config.getDemoConfigVO().jdbcUrl)
+                            .username(config.getDemoConfigVO().username)
+                            .password(config.getDemoConfigVO().password)
                             .tableInfo(tableName, "");
                     DBUtils.getTableInfo(tableInfoVO);
                     DBUtils.getTableDataInfo(tableInfoVO);
                     DBUtils.addTableInfoAttri(tableInfoVO);
-                    demoConfigVO.tableInfoCacheMap.put(tableName, tableInfoVO);
+                    config.getDemoConfigVO().tableInfoCacheMap.put(tableName, tableInfoVO);
                     tableInfoVOS.add(tableInfoVO);
                 }
             }
         }
-        demoConfigVO.setTableInfoVOS(tableInfoVOS);
+        config.getDemoConfigVO().setTableInfoVOS(tableInfoVOS);
     }
 
     public void exportDemoFile(String demoFileName, String demoFileString) throws Exception {
